@@ -3,9 +3,10 @@
 > <b>Isaac Lab + PPO</b>로 ANYmal-C 로봇이 거친 지형에서 걷는 법을 학습하는 전체 과정을 담았습니다.
 > Terraform 한 줄로 AWS GPU 인프라를 구축하고, 75분 만에 1.47억 timestep을 학습합니다.
 
-[![ANYmal-C Rough Terrain Locomotion](images/play30_frame_15s.png)](https://youtu.be/k98MgurW9y0)
-
-*학습된 ANYmal-C가 울퉁불퉁한 블록 지형 위를 안정적으로 보행하는 모습 (Play 모드 캡처)*
+<a href="https://youtu.be/k98MgurW9y0">
+  <img src="images/play30_frame_15s.png" alt="ANYmal-C Rough Terrain Locomotion" width="100%"/>
+</a>
+<p align="center"><i>학습된 ANYmal-C가 울퉁불퉁한 블록 지형 위를 안정적으로 보행하는 모습 (클릭하여 영상 재생)</i></p>
 
 ---
 
@@ -75,7 +76,7 @@ pai-sim-isaaclab/
 
 ## 아키텍처
 
-![Architecture](images/architecture.png)
+<img src="images/architecture.png" alt="Architecture" width="100%"/>
 
 ---
 
@@ -187,11 +188,11 @@ terraform destroy   # 모든 AWS 리소스 일괄 삭제
 
 ### 대시보드
 
-![Training Dashboard - Reward & Episode Length](images/dashboard_screenshot.png)
+<img src="images/dashboard_screenshot.png" alt="Training Dashboard - Reward & Episode Length" width="100%"/>
 
-![Training Dashboard - Reward Components](images/dashboard_screenshot2.png)
+<img src="images/dashboard_screenshot2.png" alt="Training Dashboard - Reward Components" width="100%"/>
 
-![Training Dashboard - Policy & Loss](images/dashboard_screenshot3.png)
+<img src="images/dashboard_screenshot3.png" alt="Training Dashboard - Policy & Loss" width="100%"/>
 
 ### Play 모드
 
