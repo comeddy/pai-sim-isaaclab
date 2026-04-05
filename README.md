@@ -190,9 +190,9 @@ terraform destroy   # 모든 AWS 리소스 일괄 삭제
 
 <img src="images/dashboard_screenshot.png" alt="Training Dashboard - Reward & Episode Length" width="100%"/>
 
-![Training Dashboard - Reward Components](images/dashboard_screenshot2.png)
+<img src="images/dashboard_screenshot2.png" alt="Training Dashboard - Reward Components" width="100%"/>
 
-![Training Dashboard - Policy & Loss](images/dashboard_screenshot3.png)
+<img src="images/dashboard_screenshot3.png" alt="Training Dashboard - Policy & Loss" width="100%"/>
 
 ### Play 모드
 
