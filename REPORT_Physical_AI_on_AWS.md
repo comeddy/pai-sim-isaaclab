@@ -229,37 +229,7 @@ Isaac Lab의 Docker 빌드 시스템은 extension 패키지(isaaclab_tasks, isaa
 
 ### 강화학습(RL) 기초 개념
 
-```
-                    ┌─────────────┐
-                    │  Environment │ (Isaac Sim: 4096개 동시 시뮬레이션)
-                    │  - 지형 생성  │
-                    │  - 물리 시뮬  │
-                    │  - 충돌 감지  │
-                    └──────┬──────┘
-                           │
-              관찰(Observation)│  보상(Reward)
-           - 관절 각도/속도    │  - 잘 걸으면 +
-           - 몸체 기울기       │  - 넘어지면 -
-           - 발 접촉 상태      │  - 에너지 낭비 -
-           - 명령 속도         │
-                           ▼
-                    ┌─────────────┐
-                    │    Agent     │ (신경망: Actor-Critic)
-                    │              │
-                    │  Actor:      │ ← 관찰 → 행동(관절 토크) 매핑
-                    │  [512→256→128]│
-                    │              │
-                    │  Critic:     │ ← 관찰 → 가치(미래 보상 예측)
-                    │  [512→256→128]│
-                    └──────┬──────┘
-                           │
-                     행동(Action)
-                  - 12개 관절 토크
-                           │
-                           ▼
-                      시뮬레이션
-                      다음 스텝
-```
+![RL Loop](images/rl-loop.png)
 
 ### PPO (Proximal Policy Optimization)
 
