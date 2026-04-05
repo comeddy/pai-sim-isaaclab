@@ -1,4 +1,4 @@
-# Physical AI Workshop: Train a Walking Robot on AWS for $12
+# Physical AI Workshop: $12로 로봇 걷게 만들기
 
 > **Isaac Lab + PPO**로 ANYmal-C 로봇이 거친 지형에서 걷는 법을 학습하는 전체 과정을 담았습니다.
 > Terraform 한 줄로 AWS GPU 인프라를 구축하고, 75분 만에 1.47억 timestep을 학습합니다.
