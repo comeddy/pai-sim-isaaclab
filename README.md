@@ -1,4 +1,4 @@
-# Physical AI on AWS — Quadruped Locomotion RL Workshop
+# Physical AI Workshop: Train a Walking Robot on AWS for $12
 
 [English](README.md) | [한국어](README.ko.md)
 

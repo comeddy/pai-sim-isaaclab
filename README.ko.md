@@ -1,4 +1,4 @@
-# Physical AI on AWS — 4족 보행 로봇 강화학습 워크샵
+# Physical AI Workshop: $12로 로봇 걷게 만들기
 
 [English](README.md) | [한국어](README.ko.md)
 

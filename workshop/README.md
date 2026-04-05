@@ -1,6 +1,6 @@
-# Physical AI on AWS Workshop
+# Physical AI Workshop: Train a Walking Robot on AWS for $12
 
-## 4족 보행 로봇 강화학습, 클라우드에서 처음부터 끝까지
+## End-to-end quadruped locomotion RL with Isaac Lab on AWS
 
 ![Anymal-C rough terrain locomotion](assets/play30_frame_15s.png)
 

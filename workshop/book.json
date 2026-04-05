@@ -1,6 +1,6 @@
 {
-  "title": "Physical AI on AWS Workshop",
-  "description": "4족 보행 로봇 강화학습, 클라우드에서 처음부터 끝까지",
+  "title": "Physical AI Workshop: Train a Walking Robot on AWS for $12",
+  "description": "End-to-end quadruped locomotion RL with Isaac Lab on AWS",
   "language": "ko",
   "plugins": [],
   "pluginsConfig": {}
