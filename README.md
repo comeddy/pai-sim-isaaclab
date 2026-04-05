@@ -197,7 +197,7 @@ terraform destroy   # 모든 AWS 리소스 일괄 삭제
 ### Play 모드
 
 <a href="https://youtu.be/k98MgurW9y0">
-  <img src="https://img.youtube.com/vi/k98MgurW9y0/maxresdefault.jpg" alt="ANYmal-C Play Mode Video" width="100%"/>
+  <img src="images/play_video_thumbnail.jpg" alt="ANYmal-C Play Mode Video" width="100%"/>
 </a>
 
 <p align="center"><i>ANYmal-C rough terrain locomotion (30s) — 클릭하여 YouTube에서 재생</i></p>
