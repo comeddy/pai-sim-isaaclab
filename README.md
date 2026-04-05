@@ -40,9 +40,18 @@ pai-sim-isaaclab/
 ├── REPORT_Physical_AI_on_AWS.md   # 종합 실습 리포트
 ├── isaac_lab_dashboard.html       # 훈련 메트릭 대시보드 (Chart.js)
 │
-├── policy_jit.pt              # TorchScript JIT 정책 (C++ 추론용)
-├── policy.onnx                # ONNX 정책 (TensorRT/Jetson용)
-├── anymal_c_play_30s.mp4      # 학습된 보행 비디오 (30초)
+├── images/                    # 스크린샷 & 프레임 캡처
+│   ├── dashboard_screenshot*.png  # 훈련 대시보드 캡처 (3장)
+│   ├── play30_frame_*.png         # Play 모드 프레임 (7장)
+│   └── play_frame_*.png           # 초기 Play 프레임 (5장)
+│
+├── models/                    # 학습된 정책 모델
+│   ├── policy_jit.pt              # TorchScript JIT (C++ 추론용)
+│   └── policy.onnx                # ONNX (TensorRT/Jetson용)
+│
+├── videos/                    # Play 모드 녹화 영상
+│   ├── anymal_c_play.mp4          # 10초 테스트 영상
+│   └── anymal_c_play_30s.mp4      # 30초 최종 영상
 │
 └── workshop/                  # GitBook 포맷 워크샵 (7 Lab + 3 Appendix)
     ├── README.md
