@@ -1,6 +1,6 @@
 # Physical AI Workshop: $12로 로봇 걷게 만들기
 
-> **Isaac Lab + PPO**로 ANYmal-C 로봇이 거친 지형에서 걷는 법을 학습하는 전체 과정을 담았습니다.
+> <b>Isaac Lab + PPO</b>로 ANYmal-C 로봇이 거친 지형에서 걷는 법을 학습하는 전체 과정을 담았습니다.
 > Terraform 한 줄로 AWS GPU 인프라를 구축하고, 75분 만에 1.47억 timestep을 학습합니다.
 
 [![ANYmal-C Rough Terrain Locomotion](images/play30_frame_15s.png)](https://youtu.be/k98MgurW9y0)
@@ -13,16 +13,16 @@
 
 | 항목 | 결과 |
 |------|------|
-| **로봇** | ANYmal-C 4족 보행 (12 관절) |
-| **환경** | Rough Terrain (바위, 경사면, 계단) |
-| **알고리즘** | PPO (Proximal Policy Optimization) |
-| **병렬 환경 수** | 4,096개 동시 시뮬레이션 |
-| **훈련 시간** | 75분 / 1,500 iterations |
-| **최종 보상** | -0.50 → **+16.29** |
-| **에피소드 길이** | 13 steps → **897 steps** (×66배) |
-| **지형 난이도** | Level 5.9 / 6.25 도달 |
-| **총 비용** | **~$12 (₩16,000)** |
-| **산출물** | MP4 비디오 + JIT/ONNX 정책 (sim-to-real) |
+| <b>로봇</b> | ANYmal-C 4족 보행 (12 관절) |
+| <b>환경</b> | Rough Terrain (바위, 경사면, 계단) |
+| <b>알고리즘</b> | PPO (Proximal Policy Optimization) |
+| <b>병렬 환경 수</b> | 4,096개 동시 시뮬레이션 |
+| <b>훈련 시간</b> | 75분 / 1,500 iterations |
+| <b>최종 보상</b> | -0.50 → <b>+16.29</b> |
+| <b>에피소드 길이</b> | 13 steps → <b>897 steps</b> (×66배) |
+| <b>지형 난이도</b> | Level 5.9 / 6.25 도달 |
+| <b>총 비용</b> | <b>~$12 (₩16,000)</b> |
+| <b>산출물</b> | MP4 비디오 + JIT/ONNX 정책 (sim-to-real) |
 
 ---
 
@@ -146,7 +146,7 @@ tail -f /var/log/isaac-lab-setup.log
 ### 3. Isaac Lab Docker 이미지 완성
 
 `user_data.sh`가 Isaac Sim pull + Isaac Lab 빌드를 자동 수행합니다.
-단, **코어 `isaaclab` 패키지 수동 설치**가 필요합니다:
+단, <b>코어 `isaaclab` 패키지 수동 설치</b>가 필요합니다:
 
 ```bash
 docker run --name setup --gpus all \
@@ -160,7 +160,7 @@ docker commit setup isaac-lab-ready:latest
 docker rm setup
 ```
 
-> **왜?** `docker compose --profile base build`는 extension 패키지만 설치하고 코어 `isaaclab` 패키지를 누락합니다. 이 단계 없이는 `ModuleNotFoundError: No module named 'isaaclab'`이 발생합니다.
+> <b>왜?</b> `docker compose --profile base build`는 extension 패키지만 설치하고 코어 `isaaclab` 패키지를 누락합니다. 이 단계 없이는 `ModuleNotFoundError: No module named 'isaaclab'`이 발생합니다.
 
 ### 4. 훈련 실행
 
@@ -176,7 +176,7 @@ docker run --rm --gpus all --network=host \
     --headless
 ```
 
-> **중요**: `--entrypoint` 오버라이드 필수! 기본 entrypoint(`runheadless.sh`)는 스트리밍 서버 모드입니다.
+> <b>중요</b>: `--entrypoint` 오버라이드 필수! 기본 entrypoint(`runheadless.sh`)는 스트리밍 서버 모드입니다.
 
 ### 5. Play 모드 (학습된 정책 시각화)
 
@@ -245,7 +245,7 @@ terraform destroy   # 모든 AWS 리소스 일괄 삭제
 | 4 | Terraform templatefile 충돌 | 🟡 | `$${VAR}` double dollar 이스케이프 |
 | 5 | user_data 재실행 안 됨 | 🟢 | `terraform taint` → 인스턴스 재생성 |
 | 6 | Isaac Lab NGC 이미지 없음 | 🔴 | 소스에서 `docker compose --profile base build` |
-| **7** | **코어 isaaclab 패키지 누락** | **🔴** | **`pip install --no-build-isolation -e source/isaaclab`** |
+| <b>7</b> | <b>코어 isaaclab 패키지 누락</b> | <b>🔴</b> | <b>`pip install --no-build-isolation -e source/isaaclab`</b> |
 | 8 | Docker entrypoint 스트리밍 모드 | 🔴 | `--entrypoint /workspace/isaaclab/isaaclab.sh` |
 | 9 | 훈련 스크립트 경로 변경 (v2.1.0) | 🟡 | `scripts/reinforcement_learning/rsl_rl/train.py` |
 | 10 | setuptools 빌드 격리 | 🔴 | `--no-build-isolation` 플래그 |
@@ -260,11 +260,11 @@ terraform destroy   # 모든 AWS 리소스 일괄 삭제
 
 | 시나리오 | 인스턴스 | 리전 | 예상 비용 |
 |---------|---------|------|----------|
-| **이번 실습** | g6e.4xlarge On-Demand | Seoul | **~$12** |
+| <b>이번 실습</b> | g6e.4xlarge On-Demand | Seoul | <b>~$12</b> |
 | 비용 최적화 | g6e.4xlarge Spot | Virginia | ~$2.50 |
 | 대규모 | g6e.12xlarge Spot | Virginia | ~$8 |
 
-**비용 절약 기능:**
+<b>비용 절약 기능:</b>
 - GPU idle 30분 → CloudWatch 자동 Stop
 - S3 체크포인트 자동 동기화 (Spot 중단 대비)
 
@@ -317,5 +317,5 @@ Isaac Sim / Isaac Lab은 [NVIDIA EULA](https://docs.omniverse.nvidia.com/isaacsi
 
 ---
 
-> **이 프로젝트는 2026년 4월 실제 AWS 배포 경험을 기반으로 작성되었습니다.**
+> <b>이 프로젝트는 2026년 4월 실제 AWS 배포 경험을 기반으로 작성되었습니다.</b>
 > 총 비용 약 ₩16,000으로 4족 보행 로봇의 강화학습을 처음부터 끝까지 완료했습니다.

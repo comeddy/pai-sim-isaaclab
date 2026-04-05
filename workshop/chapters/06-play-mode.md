@@ -1,15 +1,15 @@
 # Lab 6: Play 모드 & Policy Export
 
-> ℹ️ **INFO**
+> ℹ️ <b>INFO</b>
 >
-> **소요 시간**: 약 10분
-> **목표**: 학습된 정책을 시각화하고, 실제 로봇 배포용 형태(JIT/ONNX)로 export합니다.
+> <b>소요 시간</b>: 약 10분
+> <b>목표</b>: 학습된 정책을 시각화하고, 실제 로봇 배포용 형태(JIT/ONNX)로 export합니다.
 
 ---
 
 ## 6.1 Play 모드란?
 
-**Play 모드**는 학습된 정책(신경망)을 로드하여 로봇이 실제로 어떻게 움직이는지 확인하는 추론(inference) 모드입니다.
+<b>Play 모드</b>는 학습된 정책(신경망)을 로드하여 로봇이 실제로 어떻게 움직이는지 확인하는 추론(inference) 모드입니다.
 
 ```
 훈련(train.py)                    추론(play.py)
@@ -55,9 +55,9 @@ docker run --rm --gpus all --network=host \
 | `--num_envs` | 16 | 시각화용 소수 환경 |
 | `--load_run` | 날짜 폴더명 | 체크포인트 디렉토리 지정 |
 
-> ⚠️ **WARNING**
+> ⚠️ <b>WARNING</b>
 >
-> **`--checkpoint`은 사용하지 마세요.** `play.py`의 `--checkpoint` 인자는 `retrieve_file_path()`를 통해 해석되어, 파일명만 전달하면 `FileNotFoundError`가 발생합니다. `--load_run`만 사용하면 자동으로 최신 체크포인트를 찾습니다.
+> <b>`--checkpoint`은 사용하지 마세요.</b> `play.py`의 `--checkpoint` 인자는 `retrieve_file_path()`를 통해 해석되어, 파일명만 전달하면 `FileNotFoundError`가 발생합니다. `--load_run`만 사용하면 자동으로 최신 체크포인트를 찾습니다.
 
 ---
 
@@ -106,9 +106,9 @@ ls -lh /data/checkpoints/rsl_rl/anymal_c_rough/*/exported/policy.pt
 # policy.pt  ~1.2 MB
 ```
 
-- **용도**: C++에서 직접 추론 (PyTorch 불필요)
-- **활용**: 실제 로봇의 온보드 컴퓨터에서 실시간 제어
-- **장점**: Python 인터프리터 없이 저지연 추론
+- <b>용도</b>: C++에서 직접 추론 (PyTorch 불필요)
+- <b>활용</b>: 실제 로봇의 온보드 컴퓨터에서 실시간 제어
+- <b>장점</b>: Python 인터프리터 없이 저지연 추론
 
 ```cpp
 // 실제 로봇에서의 사용 예시 (C++)
@@ -124,9 +124,9 @@ ls -lh /data/checkpoints/rsl_rl/anymal_c_rough/*/exported/policy.onnx
 # policy.onnx  ~1.1 MB
 ```
 
-- **용도**: 다양한 하드웨어에서 추론 (TensorRT, ONNX Runtime)
-- **활용**: NVIDIA Jetson, ARM 기반 로봇 컨트롤러
-- **장점**: 프레임워크 무관, 최적화 도구 풍부
+- <b>용도</b>: 다양한 하드웨어에서 추론 (TensorRT, ONNX Runtime)
+- <b>활용</b>: NVIDIA Jetson, ARM 기반 로봇 컨트롤러
+- <b>장점</b>: 프레임워크 무관, 최적화 도구 풍부
 
 ```python
 # ONNX Runtime으로 추론
@@ -146,9 +146,9 @@ action = session.run(None, {"obs": observation})[0]
 | `policy.onnx` | 1.1 MB | ONNX | TensorRT/Jetson 추론 |
 | `rl-video-*.mp4` | 2.8 MB | MP4 비디오 | 시각적 검증, 발표 자료 |
 
-> ✅ **SUCCESS**
+> ✅ <b>SUCCESS</b>
 >
-> **Sim-to-Real의 핵심**: `policy.pt` 또는 `policy.onnx`를 실제 ANYmal-C 로봇에 탑재하면, 시뮬레이션에서 학습한 보행 정책을 **그대로** 실행할 수 있습니다.
+> <b>Sim-to-Real의 핵심</b>: `policy.pt` 또는 `policy.onnx`를 실제 ANYmal-C 로봇에 탑재하면, 시뮬레이션에서 학습한 보행 정책을 <b>그대로</b> 실행할 수 있습니다.
 
 ---
 
@@ -170,7 +170,7 @@ scp -i dev-ap-northeast-2.pem \
 
 ## 6.7 (선택) Nice DCV로 실시간 시각화
 
-headless 비디오 대신 **실시간으로** 로봇을 보고 싶다면:
+headless 비디오 대신 <b>실시간으로</b> 로봇을 보고 싶다면:
 
 1. Security Group에 포트 8443 추가
 2. Nice DCV 서버 설치 (EC2에서 무료)

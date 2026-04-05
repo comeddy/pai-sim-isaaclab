@@ -1,17 +1,17 @@
 # Lab 7: 정리 및 다음 단계
 
-> ℹ️ **INFO**
+> ℹ️ <b>INFO</b>
 >
-> **소요 시간**: 약 10분
-> **목표**: AWS 리소스를 정리하고, 후속 학습 경로를 안내합니다.
+> <b>소요 시간</b>: 약 10분
+> <b>목표</b>: AWS 리소스를 정리하고, 후속 학습 경로를 안내합니다.
 
 ---
 
 ## 7.1 리소스 정리
 
-> 🚨 **DANGER**
+> 🚨 <b>DANGER</b>
 >
-> **반드시 실행하세요.** g6e.4xlarge는 시간당 ~$3 과금됩니다. 워크샵 완료 후 리소스를 삭제하지 않으면 불필요한 비용이 발생합니다.
+> <b>반드시 실행하세요.</b> g6e.4xlarge는 시간당 ~$3 과금됩니다. 워크샵 완료 후 리소스를 삭제하지 않으면 불필요한 비용이 발생합니다.
 
 ### 체크포인트 백업 (삭제 전)
 
@@ -49,9 +49,9 @@ terraform destroy
 | CloudWatch Alarm | GPU 유휴 감지 |
 | S3 Bucket | 체크포인트 저장소 (비어있지 않으면 수동 삭제 필요) |
 
-> ⚠️ **WARNING**
+> ⚠️ <b>WARNING</b>
 >
-> **S3 버킷**: `terraform destroy`는 비어있지 않은 S3 버킷을 삭제하지 못할 수 있습니다. `aws s3 rb s3://BUCKET_NAME --force`로 수동 삭제하세요.
+> <b>S3 버킷</b>: `terraform destroy`는 비어있지 않은 S3 버킷을 삭제하지 못할 수 있습니다. `aws s3 rb s3://BUCKET_NAME --force`로 수동 삭제하세요.
 
 ---
 
@@ -101,14 +101,14 @@ init_noise_std: 0.5
 
 시뮬레이션→실제 환경 전이의 핵심 기법:
 
-1. **Domain Randomization**: 물리 파라미터를 랜덤하게 변경하며 학습
+1. <b>Domain Randomization</b>: 물리 파라미터를 랜덤하게 변경하며 학습
    - 질량 ±20%, 마찰 ±30%, 관절 강성 ±15%
    - 시뮬레이션과 실제의 gap을 줄이는 핵심 기법
 
-2. **System Identification**: 실제 로봇의 물리 파라미터를 정밀 측정
+2. <b>System Identification</b>: 실제 로봇의 물리 파라미터를 정밀 측정
    - 시뮬레이션의 정확도를 높여 sim-to-real gap 최소화
 
-3. **Real-World Fine-tuning**: 시뮬레이션 정책을 실제 환경에서 미세 조정
+3. <b>Real-World Fine-tuning</b>: 시뮬레이션 정책을 실제 환경에서 미세 조정
 
 ### Level 4: Multi-GPU 분산 훈련
 
@@ -155,9 +155,9 @@ torchrun --nnodes=1 --nproc_per_node=4 train.py --distributed
 
 ---
 
-> ✅ **SUCCESS**
+> ✅ <b>SUCCESS</b>
 >
-> **축하합니다!** 🎉 AWS 클라우드에서 Physical AI 강화학습을 처음부터 끝까지 완료했습니다. 약 ₩16,000의 비용으로 4족 보행 로봇이 거친 지형을 걷는 정책을 학습하고, 실제 로봇에 배포할 수 있는 형태로 export했습니다.
+> <b>축하합니다!</b> 🎉 AWS 클라우드에서 Physical AI 강화학습을 처음부터 끝까지 완료했습니다. 약 ₩16,000의 비용으로 4족 보행 로봇이 거친 지형을 걷는 정책을 학습하고, 실제 로봇에 배포할 수 있는 형태로 export했습니다.
 
 ---
 

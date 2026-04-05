@@ -1,15 +1,15 @@
 # Lab 2: AWS GPU 인프라 구축
 
-> ℹ️ **INFO**
+> ℹ️ <b>INFO</b>
 >
-> **소요 시간**: 약 20분
-> **목표**: Terraform으로 Isaac Lab 훈련용 EC2 GPU 인스턴스를 프로비저닝합니다.
+> <b>소요 시간</b>: 약 20분
+> <b>목표</b>: Terraform으로 Isaac Lab 훈련용 EC2 GPU 인스턴스를 프로비저닝합니다.
 
 ---
 
 ## 2.1 Terraform이란?
 
-인프라를 **코드**로 정의하는 도구입니다.
+인프라를 <b>코드</b>로 정의하는 도구입니다.
 
 ```
 AWS 콘솔 클릭 (수동)          Terraform (코드)
@@ -72,9 +72,9 @@ data_volume_size = 500                   # GB (체크포인트 저장)
 enable_idle_stop = true                  # GPU 유휴 30분 시 자동 중지
 ```
 
-> 🚨 **DANGER**
+> 🚨 <b>DANGER</b>
 >
-> **보안**: `terraform.tfvars`에 NGC API Key와 같은 시크릿이 포함됩니다. 반드시 `.gitignore`에 추가하세요. 프로덕션에서는 AWS Secrets Manager를 사용하세요.
+> <b>보안</b>: `terraform.tfvars`에 NGC API Key와 같은 시크릿이 포함됩니다. 반드시 `.gitignore`에 추가하세요. 프로덕션에서는 AWS Secrets Manager를 사용하세요.
 
 ---
 
@@ -93,12 +93,12 @@ data "aws_ami" "dl_base" {
 }
 ```
 
-> ⚠️ **WARNING**
+> ⚠️ <b>WARNING</b>
 >
-> **왜 Deep Learning Base OSS AMI인가?**
-> - NVIDIA 드라이버, Docker, NVIDIA Container Toolkit이 **이미 설치**되어 있음
+> <b>왜 Deep Learning Base OSS AMI인가?</b>
+> - NVIDIA 드라이버, Docker, NVIDIA Container Toolkit이 <b>이미 설치</b>되어 있음
 > - Isaac Sim은 Docker 컨테이너로 실행하므로, 무거운 PyTorch DLAMI는 불필요
-> - AMI ID는 리전/시점마다 다르므로 **절대 하드코딩하지 말 것** → `data` 소스로 동적 조회
+> - AMI ID는 리전/시점마다 다르므로 <b>절대 하드코딩하지 말 것</b> → `data` 소스로 동적 조회
 
 ### EC2 인스턴스
 
@@ -128,7 +128,7 @@ resource "aws_instance" "isaac" {
 | 인스턴스 | GPU | VRAM | 용도 | 시간당 비용 |
 |----------|-----|------|------|------------|
 | g6e.xlarge | 1× L40S | 48 GB | 개발/디버깅 | ~$1.00 |
-| **g6e.4xlarge** | **1× L40S** | **48 GB** | **표준 RL 훈련** | **~$3.00** |
+| <b>g6e.4xlarge</b> | <b>1× L40S</b> | <b>48 GB</b> | <b>표준 RL 훈련</b> | <b>~$3.00</b> |
 | g6e.12xlarge | 4× L40S | 192 GB | 대규모 훈련 | ~$8.00 |
 | g6e.48xlarge | 8× L40S | 384 GB | 분산 훈련 | ~$32.00 |
 
@@ -150,9 +150,9 @@ resource "aws_volume_attachment" "data" {
 }
 ```
 
-> ℹ️ **INFO**
+> ℹ️ <b>INFO</b>
 >
-> **왜 별도 EBS?** 인스턴스를 삭제해도 체크포인트가 보존됩니다. root 볼륨은 `delete_on_termination = true`이지만, 데이터 볼륨은 독립적으로 유지됩니다.
+> <b>왜 별도 EBS?</b> 인스턴스를 삭제해도 체크포인트가 보존됩니다. root 볼륨은 `delete_on_termination = true`이지만, 데이터 볼륨은 독립적으로 유지됩니다.
 
 ### 비용 절약: GPU 유휴 자동 중지
 
@@ -170,7 +170,7 @@ resource "aws_cloudwatch_metric_alarm" "gpu_idle" {
 }
 ```
 
-훈련 완료 후 GPU가 30분 이상 유휴 상태이면 자동으로 인스턴스가 **중지**(Stop)됩니다.
+훈련 완료 후 GPU가 30분 이상 유휴 상태이면 자동으로 인스턴스가 <b>중지</b>(Stop)됩니다.
 
 ---
 
@@ -211,9 +211,9 @@ ssh -i dev-ap-northeast-2.pem ubuntu@<PUBLIC_IP>
 tail -f /var/log/isaac-lab-setup.log
 ```
 
-> ⚠️ **WARNING**
+> ⚠️ <b>WARNING</b>
 >
-> **주의**: `user_data.sh`는 Docker 이미지 pull, Isaac Lab 빌드 등 무거운 작업을 수행합니다. 완료까지 **15-25분** 소요됩니다. 로그에 `Isaac Lab setup COMPLETE`가 나올 때까지 기다리세요.
+> <b>주의</b>: `user_data.sh`는 Docker 이미지 pull, Isaac Lab 빌드 등 무거운 작업을 수행합니다. 완료까지 <b>15-25분</b> 소요됩니다. 로그에 `Isaac Lab setup COMPLETE`가 나올 때까지 기다리세요.
 
 ### GPU 동작 확인
 
@@ -246,9 +246,9 @@ egress {
 }
 ```
 
-> 🚨 **DANGER**
+> 🚨 <b>DANGER</b>
 >
-> **절대 0.0.0.0/0으로 SSH를 열지 마세요.** 반드시 `allowed_ssh_cidrs`에 본인 IP만 지정하세요. `curl ifconfig.me`로 현재 IP를 확인할 수 있습니다.
+> <b>절대 0.0.0.0/0으로 SSH를 열지 마세요.</b> 반드시 `allowed_ssh_cidrs`에 본인 IP만 지정하세요. `curl ifconfig.me`로 현재 IP를 확인할 수 있습니다.
 
 ---
 

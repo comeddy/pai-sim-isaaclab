@@ -1,6 +1,6 @@
 # Appendix A: 실전 트러블슈팅 12선
 
-> ⚠️ **WARNING**
+> ⚠️ <b>WARNING</b>
 >
 > 이 목록은 2026년 4월 실제 AWS 배포에서 겪은 문제들입니다. 공식 문서에 없는 실전 함정과 해결법을 담았습니다.
 
@@ -12,10 +12,10 @@
 
 | | |
 |---|---|
-| **증상** | `user_data.sh`에서 `apt-get install` 실패 |
-| **에러** | `E: Could not get lock /var/lib/dpkg/lock-frontend` |
-| **원인** | Ubuntu `unattended-upgrades`가 부팅 직후 dpkg lock 점유 |
-| **빈도** | 거의 매번 (3/3 시도에서 발생) |
+| <b>증상</b> | `user_data.sh`에서 `apt-get install` 실패 |
+| <b>에러</b> | `E: Could not get lock /var/lib/dpkg/lock-frontend` |
+| <b>원인</b> | Ubuntu `unattended-upgrades`가 부팅 직후 dpkg lock 점유 |
+| <b>빈도</b> | 거의 매번 (3/3 시도에서 발생) |
 
 ```bash
 # 해결: user_data.sh 상단에 추가
@@ -34,9 +34,9 @@ apt-get install -y -o DPkg::Lock::Timeout=120 ...
 
 | | |
 |---|---|
-| **증상** | `/dev/xvdf` 디바이스가 없음 |
-| **원인** | g6e = Nitro 기반 → EBS가 `/dev/nvme*n1`으로 표시 |
-| **해결** | 동적 디바이스 탐색 함수 사용 |
+| <b>증상</b> | `/dev/xvdf` 디바이스가 없음 |
+| <b>원인</b> | g6e = Nitro 기반 → EBS가 `/dev/nvme*n1`으로 표시 |
+| <b>해결</b> | 동적 디바이스 탐색 함수 사용 |
 
 ```bash
 find_data_device() {
@@ -57,9 +57,9 @@ find_data_device() {
 
 | | |
 |---|---|
-| **증상** | `mkfs.ext4 /dev/nvmeXn1` → "device is in use" |
-| **원인** | DL Base AMI가 NVMe instance store를 LVM으로 `/opt/dlami/nvme`에 마운트 |
-| **해결** | 기존 마운트 재활용 |
+| <b>증상</b> | `mkfs.ext4 /dev/nvmeXn1` → "device is in use" |
+| <b>원인</b> | DL Base AMI가 NVMe instance store를 LVM으로 `/opt/dlami/nvme`에 마운트 |
+| <b>해결</b> | 기존 마운트 재활용 |
 
 ```bash
 if mountpoint -q /opt/dlami/nvme 2>/dev/null; then
@@ -77,9 +77,9 @@ fi
 
 | | |
 |---|---|
-| **증상** | `terraform apply` 시 `Invalid reference` 에러 |
-| **원인** | Bash `${VAR:-default}`가 Terraform 변수로 해석 |
-| **해결** | `$${VAR:-default}`로 이스케이프 (double dollar) |
+| <b>증상</b> | `terraform apply` 시 `Invalid reference` 에러 |
+| <b>원인</b> | Bash `${VAR:-default}`가 Terraform 변수로 해석 |
+| <b>해결</b> | `$${VAR:-default}`로 이스케이프 (double dollar) |
 
 ```hcl
 # main.tf
@@ -95,9 +95,9 @@ user_data = base64encode(templatefile("user_data.sh", {
 
 | | |
 |---|---|
-| **증상** | `user_data.sh` 수정 → `terraform apply` → 변화 없음 |
-| **원인** | cloud-init은 첫 부팅에서만 `user_data` 실행 |
-| **해결** | 인스턴스 재생성 |
+| <b>증상</b> | `user_data.sh` 수정 → `terraform apply` → 변화 없음 |
+| <b>원인</b> | cloud-init은 첫 부팅에서만 `user_data` 실행 |
+| <b>해결</b> | 인스턴스 재생성 |
 
 ```bash
 terraform taint aws_instance.isaac
@@ -112,9 +112,9 @@ terraform apply
 
 | | |
 |---|---|
-| **증상** | `docker pull nvcr.io/nvidia/isaac-lab:v2.1.0` → Not Found |
-| **원인** | Isaac Lab은 NGC에 pre-built 이미지를 **제공하지 않음** |
-| **해결** | 소스에서 빌드 |
+| <b>증상</b> | `docker pull nvcr.io/nvidia/isaac-lab:v2.1.0` → Not Found |
+| <b>원인</b> | Isaac Lab은 NGC에 pre-built 이미지를 <b>제공하지 않음</b> |
+| <b>해결</b> | 소스에서 빌드 |
 
 ```bash
 git clone --branch v2.1.0 https://github.com/isaac-sim/IsaacLab.git
@@ -127,10 +127,10 @@ cd IsaacLab && docker compose --profile base build
 
 | | |
 |---|---|
-| **증상** | `ModuleNotFoundError: No module named 'isaaclab'` |
-| **원인** | Docker build가 extension만 설치, 코어 패키지 누락 |
-| **빈도** | 100% 발생 (가장 치명적) |
-| **해결** | 수동 설치 후 docker commit |
+| <b>증상</b> | `ModuleNotFoundError: No module named 'isaaclab'` |
+| <b>원인</b> | Docker build가 extension만 설치, 코어 패키지 누락 |
+| <b>빈도</b> | 100% 발생 (가장 치명적) |
+| <b>해결</b> | 수동 설치 후 docker commit |
 
 ```bash
 docker run --name setup --gpus all --entrypoint bash isaac-lab-base:latest -c '
@@ -146,9 +146,9 @@ docker commit setup isaac-lab-ready:latest
 
 | | |
 |---|---|
-| **증상** | 컨테이너 실행 후 훈련 미시작, GPU 유휴 |
-| **원인** | 기본 ENTRYPOINT `runheadless.sh` = 스트리밍 서버 모드 |
-| **해결** | entrypoint 오버라이드 |
+| <b>증상</b> | 컨테이너 실행 후 훈련 미시작, GPU 유휴 |
+| <b>원인</b> | 기본 ENTRYPOINT `runheadless.sh` = 스트리밍 서버 모드 |
+| <b>해결</b> | entrypoint 오버라이드 |
 
 ```bash
 docker run ... \
@@ -163,9 +163,9 @@ docker run ... \
 
 | | |
 |---|---|
-| **증상** | `FileNotFoundError: source/standalone/workflows/rsl_rl/train.py` |
-| **원인** | v2.1.0에서 경로 변경 |
-| **해결** | 새 경로 사용 |
+| <b>증상</b> | `FileNotFoundError: source/standalone/workflows/rsl_rl/train.py` |
+| <b>원인</b> | v2.1.0에서 경로 변경 |
+| <b>해결</b> | 새 경로 사용 |
 
 ```
 구: source/standalone/workflows/rsl_rl/train.py
@@ -178,9 +178,9 @@ docker run ... \
 
 | | |
 |---|---|
-| **증상** | `pip install -e source/isaaclab` → `No module named 'pkg_resources'` |
-| **원인** | pip 빌드 격리 환경에 setuptools 없음 |
-| **해결** | `--no-build-isolation` 플래그 |
+| <b>증상</b> | `pip install -e source/isaaclab` → `No module named 'pkg_resources'` |
+| <b>원인</b> | pip 빌드 격리 환경에 setuptools 없음 |
+| <b>해결</b> | `--no-build-isolation` 플래그 |
 
 ```bash
 pip install --no-build-isolation -e /workspace/isaaclab/source/isaaclab
@@ -192,9 +192,9 @@ pip install --no-build-isolation -e /workspace/isaaclab/source/isaaclab
 
 | | |
 |---|---|
-| **증상** | 패키지 설치 후에도 `ModuleNotFoundError` 지속 |
-| **원인** | `-v host/source:/workspace/isaaclab/source:rw`가 `.pth` 참조 파괴 |
-| **해결** | editable install된 소스 디렉토리를 마운트하지 않기 |
+| <b>증상</b> | 패키지 설치 후에도 `ModuleNotFoundError` 지속 |
+| <b>원인</b> | `-v host/source:/workspace/isaaclab/source:rw`가 `.pth` 참조 파괴 |
+| <b>해결</b> | editable install된 소스 디렉토리를 마운트하지 않기 |
 
 ```bash
 # ❌ 하지 마세요
@@ -210,9 +210,9 @@ pip install --no-build-isolation -e /workspace/isaaclab/source/isaaclab
 
 | | |
 |---|---|
-| **증상** | 훈련 시작 후 4분간 아무 출력 없음 (행 걸린 줄 착각) |
-| **원인** | Isaac Sim의 Vulkan RtPso 셰이더 파이프라인 첫 컴파일 |
-| **해결** | 인내심 + 캐시 볼륨 마운트로 재컴파일 방지 |
+| <b>증상</b> | 훈련 시작 후 4분간 아무 출력 없음 (행 걸린 줄 착각) |
+| <b>원인</b> | Isaac Sim의 Vulkan RtPso 셰이더 파이프라인 첫 컴파일 |
+| <b>해결</b> | 인내심 + 캐시 볼륨 마운트로 재컴파일 방지 |
 
 ```bash
 -v "$CACHE_DIR/kit:/isaac-sim/kit/cache:rw"
@@ -230,7 +230,7 @@ pip install --no-build-isolation -e /workspace/isaaclab/source/isaaclab
 | 4 | templatefile | 인프라 | 🟡 중 |
 | 5 | user_data 재실행 | 인프라 | 🟢 하 |
 | 6 | NGC 이미지 없음 | Docker | 🔴 상 |
-| **7** | **코어 패키지 누락** | **Docker** | **🔴 상** |
+| <b>7</b> | <b>코어 패키지 누락</b> | <b>Docker</b> | <b>🔴 상</b> |
 | 8 | Entrypoint 모드 | Docker | 🔴 상 |
 | 9 | 스크립트 경로 | Docker | 🟡 중 |
 | 10 | 빌드 격리 | Docker | 🔴 상 |

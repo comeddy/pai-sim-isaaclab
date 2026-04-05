@@ -1,9 +1,9 @@
 # Lab 3: Isaac Lab Docker 이미지 빌드
 
-> ℹ️ **INFO**
+> ℹ️ <b>INFO</b>
 >
-> **소요 시간**: 약 30분 (빌드 대기 포함)
-> **목표**: Isaac Sim + Isaac Lab Docker 이미지를 빌드하고, 핵심 패키지 누락 문제를 해결합니다.
+> <b>소요 시간</b>: 약 30분 (빌드 대기 포함)
+> <b>목표</b>: Isaac Sim + Isaac Lab Docker 이미지를 빌드하고, 핵심 패키지 누락 문제를 해결합니다.
 
 ---
 
@@ -18,9 +18,9 @@ NGC에 공식 Docker 이미지 있음          NGC에 이미지 없음 ⚠️
 nvcr.io/nvidia/isaac-sim:4.5.0      소스에서 직접 빌드 필요
 ```
 
-> 🚨 **DANGER**
+> 🚨 <b>DANGER</b>
 >
-> **핵심 주의점**: Isaac Lab은 NGC에 pre-built Docker 이미지를 **제공하지 않습니다**. 소스에서 직접 빌드해야 합니다.
+> <b>핵심 주의점</b>: Isaac Lab은 NGC에 pre-built Docker 이미지를 <b>제공하지 않습니다</b>. 소스에서 직접 빌드해야 합니다.
 
 ---
 
@@ -53,11 +53,11 @@ docker images | grep isaac-lab
 
 ### Step 3: 코어 패키지 수동 설치 (★ 가장 중요)
 
-> 🚨 **DANGER**
+> 🚨 <b>DANGER</b>
 >
-> **이 단계를 건너뛰면 훈련이 100% 실패합니다.**
+> <b>이 단계를 건너뛰면 훈련이 100% 실패합니다.</b>
 > 
-> `docker compose --profile base build`는 extension 패키지(isaaclab\_tasks, isaaclab\_rl 등)만 설치하고, **코어 `isaaclab` 패키지는 설치하지 않습니다**. 이것은 공식 문서에 명확히 언급되지 않는 함정입니다.
+> `docker compose --profile base build`는 extension 패키지(isaaclab\_tasks, isaaclab\_rl 등)만 설치하고, <b>코어 `isaaclab` 패키지는 설치하지 않습니다</b>. 이것은 공식 문서에 명확히 언급되지 않는 함정입니다.
 
 ```bash
 # 컨테이너를 시작하고 코어 패키지 설치
@@ -173,9 +173,9 @@ isaac-lab-ready:latest (26.8 GB)
 │               └── play.py        ← 추론/시각화 스크립트
 ```
 
-> ⚠️ **WARNING**
+> ⚠️ <b>WARNING</b>
 >
-> **ENTRYPOINT 주의**: 이미지의 기본 ENTRYPOINT는 `runheadless.sh`로, Isaac Sim을 **스트리밍 서버 모드**로 시작합니다. 훈련 시에는 반드시 `--entrypoint /workspace/isaaclab/isaaclab.sh`로 오버라이드해야 합니다.
+> <b>ENTRYPOINT 주의</b>: 이미지의 기본 ENTRYPOINT는 `runheadless.sh`로, Isaac Sim을 <b>스트리밍 서버 모드</b>로 시작합니다. 훈련 시에는 반드시 `--entrypoint /workspace/isaaclab/isaaclab.sh`로 오버라이드해야 합니다.
 
 ---
 

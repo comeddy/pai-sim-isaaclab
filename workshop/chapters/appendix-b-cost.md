@@ -31,7 +31,7 @@ EBS 저장소:
 | 인스턴스 | GPU | VRAM | 온디맨드/hr | Spot/hr | 용도 |
 |----------|-----|------|------------|---------|------|
 | g6e.xlarge | 1× L40S | 48 GB | ~$1.00 | ~$0.35 | 개발/디버깅 |
-| **g6e.4xlarge** | **1× L40S** | **48 GB** | **~$3.00** | **~$1.00** | **표준 훈련** |
+| <b>g6e.4xlarge</b> | <b>1× L40S</b> | <b>48 GB</b> | <b>~$3.00</b> | <b>~$1.00</b> | <b>표준 훈련</b> |
 | g6e.12xlarge | 4× L40S | 192 GB | ~$8.00 | ~$2.80 | 대규모 훈련 |
 | g6e.48xlarge | 8× L40S | 384 GB | ~$32.00 | ~$11.00 | 분산 훈련 |
 
@@ -54,9 +54,9 @@ resource "aws_spot_instance_request" "isaac" {
 }
 ```
 
-> ℹ️ **INFO**
+> ℹ️ <b>INFO</b>
 >
-> RL 훈련은 50 iteration마다 체크포인트를 저장하므로, Spot 중단 시 `--resume` 플래그로 이어서 학습할 수 있습니다. **중단 허용 워크로드에 최적.**
+> RL 훈련은 50 iteration마다 체크포인트를 저장하므로, Spot 중단 시 `--resume` 플래그로 이어서 학습할 수 있습니다. <b>중단 허용 워크로드에 최적.</b>
 
 ### 2. GPU 유휴 자동 중지
 
@@ -92,14 +92,14 @@ aws ec2 create-volume --snapshot-id snap-xxx --availability-zone ap-northeast-2a
 
 | 리전 | g6e.4xlarge/hr | 비고 |
 |------|---------------|------|
-| us-east-1 (Virginia) | ~$1.32 | **가장 저렴** |
+| us-east-1 (Virginia) | ~$1.32 | <b>가장 저렴</b> |
 | us-west-2 (Oregon) | ~$1.32 | 저렴 |
 | ap-northeast-2 (Seoul) | ~$3.00 | 한국 접속 빠름 |
 | eu-west-1 (Ireland) | ~$1.50 | 유럽 |
 
-> ℹ️ **INFO**
+> ℹ️ <b>INFO</b>
 >
-> 네트워크 지연이 중요하지 않은 headless 훈련은 **us-east-1**에서 실행하면 비용을 ~56% 절약할 수 있습니다.
+> 네트워크 지연이 중요하지 않은 headless 훈련은 <b>us-east-1</b>에서 실행하면 비용을 ~56% 절약할 수 있습니다.
 
 ---
 
@@ -107,10 +107,10 @@ aws ec2 create-volume --snapshot-id snap-xxx --availability-zone ap-northeast-2a
 
 | 시나리오 | 설정 | 예상 비용 |
 |---------|------|----------|
-| 이번 워크샵 (그대로) | g6e.4xlarge, Seoul, On-Demand | **~$12** |
-| 비용 최적화 | g6e.4xlarge, Virginia, Spot | **~$2.50** |
-| 큰 모델 학습 | g6e.12xlarge, Virginia, Spot | **~$8** |
-| 분산 훈련 (8 GPU) | g6e.48xlarge, Virginia, Spot | **~$35** |
+| 이번 워크샵 (그대로) | g6e.4xlarge, Seoul, On-Demand | <b>~$12</b> |
+| 비용 최적화 | g6e.4xlarge, Virginia, Spot | <b>~$2.50</b> |
+| 큰 모델 학습 | g6e.12xlarge, Virginia, Spot | <b>~$8</b> |
+| 분산 훈련 (8 GPU) | g6e.48xlarge, Virginia, Spot | <b>~$35</b> |
 
 ---
 

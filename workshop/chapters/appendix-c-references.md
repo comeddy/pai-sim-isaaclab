@@ -11,8 +11,8 @@
 | CUDA | 13.0 | AMI 포함 |
 | Docker | 27.x | AMI 포함 |
 | NVIDIA Container Toolkit | latest | AMI 포함 |
-| Isaac Sim | **4.5.0** | NGC 컨테이너 |
-| Isaac Lab | **v2.1.0** | 소스 빌드 |
+| Isaac Sim | <b>4.5.0</b> | NGC 컨테이너 |
+| Isaac Lab | <b>v2.1.0</b> | 소스 빌드 |
 | PyTorch | 2.5.1 | Isaac Sim 내장 |
 | RSL-RL | 2.x | isaaclab.sh -i rsl_rl |
 | Python | 3.10 | Isaac Sim 내장 |
@@ -25,7 +25,7 @@
 
 | 리소스 | 사양 |
 |--------|------|
-| **EC2 Instance** | g6e.4xlarge |
+| <b>EC2 Instance</b> | g6e.4xlarge |
 | GPU | NVIDIA L40S (48 GB VRAM) |
 | CPU | AMD EPYC 7R13 (16 vCPU) |
 | RAM | 128 GiB |
@@ -122,19 +122,19 @@ init_noise_std: 1.0
 
 | 용어 | 설명 |
 |------|------|
-| **PPO** | Proximal Policy Optimization — 안정적인 정책 경사 RL 알고리즘 |
-| **Actor-Critic** | 정책(Actor)과 가치함수(Critic) 두 네트워크를 사용하는 RL 구조 |
-| **Curriculum Learning** | 쉬운 → 어려운 순서로 학습 난이도를 조절하는 기법 |
-| **Domain Randomization** | 시뮬레이션 파라미터를 랜덤화하여 sim-to-real gap을 줄이는 기법 |
-| **Sim-to-Real** | 시뮬레이션에서 학습한 정책을 실제 로봇에 전이하는 과정 |
-| **Headless** | 모니터/디스플레이 없이 GPU 연산만 수행하는 실행 모드 |
-| **NGC** | NVIDIA GPU Cloud — GPU 최적화 컨테이너/모델 저장소 |
-| **EBS** | Elastic Block Store — AWS의 블록 스토리지 (가상 하드디스크) |
-| **Nitro** | AWS의 차세대 가상화 아키텍처 (NVMe 디바이스 이름 사용) |
-| **ONNX** | Open Neural Network Exchange — 다양한 프레임워크 간 모델 교환 포맷 |
-| **JIT** | Just-In-Time compilation — PyTorch 모델을 C++에서 실행 가능하게 컴파일 |
-| **USD** | Universal Scene Description — Pixar 개발 3D 장면 기술 포맷 |
-| **PhysX** | NVIDIA의 실시간 물리 시뮬레이션 엔진 |
+| <b>PPO</b> | Proximal Policy Optimization — 안정적인 정책 경사 RL 알고리즘 |
+| <b>Actor-Critic</b> | 정책(Actor)과 가치함수(Critic) 두 네트워크를 사용하는 RL 구조 |
+| <b>Curriculum Learning</b> | 쉬운 → 어려운 순서로 학습 난이도를 조절하는 기법 |
+| <b>Domain Randomization</b> | 시뮬레이션 파라미터를 랜덤화하여 sim-to-real gap을 줄이는 기법 |
+| <b>Sim-to-Real</b> | 시뮬레이션에서 학습한 정책을 실제 로봇에 전이하는 과정 |
+| <b>Headless</b> | 모니터/디스플레이 없이 GPU 연산만 수행하는 실행 모드 |
+| <b>NGC</b> | NVIDIA GPU Cloud — GPU 최적화 컨테이너/모델 저장소 |
+| <b>EBS</b> | Elastic Block Store — AWS의 블록 스토리지 (가상 하드디스크) |
+| <b>Nitro</b> | AWS의 차세대 가상화 아키텍처 (NVMe 디바이스 이름 사용) |
+| <b>ONNX</b> | Open Neural Network Exchange — 다양한 프레임워크 간 모델 교환 포맷 |
+| <b>JIT</b> | Just-In-Time compilation — PyTorch 모델을 C++에서 실행 가능하게 컴파일 |
+| <b>USD</b> | Universal Scene Description — Pixar 개발 3D 장면 기술 포맷 |
+| <b>PhysX</b> | NVIDIA의 실시간 물리 시뮬레이션 엔진 |
 
 ---
 
