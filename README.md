@@ -3,7 +3,7 @@
 > **Isaac Lab + PPO**로 ANYmal-C 로봇이 거친 지형에서 걷는 법을 학습하는 전체 과정을 담았습니다.
 > Terraform 한 줄로 AWS GPU 인프라를 구축하고, 75분 만에 1.47억 timestep을 학습합니다.
 
-![ANYmal-C Rough Terrain Locomotion](images/play30_frame_15s.png)
+[![ANYmal-C Rough Terrain Locomotion](images/play30_frame_15s.png)](https://youtu.be/k98MgurW9y0)
 
 *학습된 ANYmal-C가 울퉁불퉁한 블록 지형 위를 안정적으로 보행하는 모습 (Play 모드 캡처)*
 
@@ -227,9 +227,9 @@ terraform destroy   # 모든 AWS 리소스 일괄 삭제
 
 ### Play 모드
 
-![Play Mode - 5초](images/play30_frame_5s.png)
-![Play Mode - 15초](images/play30_frame_15s.png)
-![Play Mode - 25초](images/play30_frame_25s.png)
+[![Play Mode - 5초](images/play30_frame_5s.png)](https://youtu.be/k98MgurW9y0)
+[![Play Mode - 15초](images/play30_frame_15s.png)](https://youtu.be/k98MgurW9y0)
+[![Play Mode - 25초](images/play30_frame_25s.png)](https://youtu.be/k98MgurW9y0)
 
 ---
 
