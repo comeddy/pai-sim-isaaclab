@@ -75,7 +75,7 @@ pai-sim-isaaclab/
 
 ## 아키텍처
 
-![Architecture](images/architecture.svg)
+![Architecture](images/architecture.png)
 
 ---
 
