@@ -152,19 +152,7 @@ Export된 정책 파일은 **실제 물리 로봇의 온보드 컴퓨터**에서
 
 ### 전체 파이프라인
 
-```
-[시뮬레이션 — AWS GPU 서버]              [실제 로봇 — 엣지 디바이스]
-
- 4,096개 환경에서 PPO 훈련                  IMU + 관절 센서 (48차원)
-         ↓                                         ↓
- policy.onnx (1.1 MB) ─── 전송 ───→   TensorRT 추론 엔진 (< 0.1ms)
-                                                   ↓
-                                          12개 관절 목표 위치 출력
-                                                   ↓
-                                          PD 컨트롤러 → 모터 토크
-                                                   ↓
-                                              로봇이 걷는다!
-```
+<figure><img src="../../.gitbook/assets/sim_to_real_pipeline.png" alt=""><figcaption><p>Sim-to-Real 파이프라인: AWS에서 학습한 1.1 MB 정책이 Jetson Orin에서 0.1ms 만에 추론되어 로봇을 걷게 합니다</p></figcaption></figure>
 
 > 1.47억 timestep의 경험이 1.1 MB 파일로 압축되어 실제 로봇의 "뇌"가 됩니다.
 
