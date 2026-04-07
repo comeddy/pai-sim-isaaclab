@@ -248,38 +248,7 @@ while running:
 
 ### 실제 ANYmal-C 배포 구성
 
-```
-┌─────────────────────────────────┐
-│  ANYmal-C 로봇                   │
-│                                  │
-│  ┌──────────────────────┐       │
-│  │ NVIDIA Jetson Orin   │       │
-│  │                      │       │
-│  │  policy.engine       │       │
-│  │  (TensorRT FP16)     │       │
-│  │       ↑       ↓      │       │
-│  │   48차원 obs  12차원 action  │
-│  └──────┬───────┬───────┘       │
-│         │       │                │
-│    IMU/관절   PD 컨트롤러        │
-│    센서        → 12개 모터       │
-└─────────────────────────────────┘
-
-입력 (48차원):
-  - 기본 각속도 (3)
-  - 중력 벡터 (3)
-  - 속도 명령 (3)
-  - 관절 각도 (12)
-  - 관절 각속도 (12)
-  - 이전 행동 (12)
-  - 높이 스캔 (선택)
-
-출력 (12차원):
-  - RF_HAA, RF_HFE, RF_KFE  (오른쪽 앞다리)
-  - LF_HAA, LF_HFE, LF_KFE  (왼쪽 앞다리)
-  - RH_HAA, RH_HFE, RH_KFE  (오른쪽 뒷다리)
-  - LH_HAA, LH_HFE, LH_KFE  (왼쪽 뒷다리)
-```
+<figure><img src="../../.gitbook/assets/anymal_c_deployment.png" alt=""><figcaption><p>ANYmal-C 온보드 배포 구성: 48차원 센서 입력 → Jetson Orin TensorRT 추론 → 12차원 관절 출력</p></figcaption></figure>
 
 ***
 
