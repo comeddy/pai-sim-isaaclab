@@ -151,7 +151,144 @@ action = session.run(None, {"obs": observation})[0]
 
 ***
 
-## 6.6 비디오를 로컬로 다운로드
+## 6.6 Sim-to-Real: 실제 로봇에 정책 배포하기
+
+Export된 정책 파일은 **실제 물리 로봇의 온보드 컴퓨터**에서 실행하기 위한 것입니다. 시뮬레이션에서 학습한 "뇌"를 로봇에 이식하는 과정이 <b>Sim-to-Real Transfer</b>의 핵심입니다.
+
+### 전체 파이프라인
+
+```
+[시뮬레이션 — AWS GPU 서버]              [실제 로봇 — 엣지 디바이스]
+
+ 4,096개 환경에서 PPO 훈련                  IMU + 관절 센서 (48차원)
+         ↓                                         ↓
+ policy.onnx (1.1 MB) ─── 전송 ───→   TensorRT 추론 엔진 (< 0.1ms)
+                                                   ↓
+                                          12개 관절 목표 위치 출력
+                                                   ↓
+                                          PD 컨트롤러 → 모터 토크
+                                                   ↓
+                                              로봇이 걷는다!
+```
+
+> 1.47억 timestep의 경험이 1.1 MB 파일로 압축되어 실제 로봇의 "뇌"가 됩니다.
+
+### policy.pt 사용법 — C++ 실시간 제어
+
+PyTorch의 TorchScript JIT 포맷은 Python 없이 C++에서 직접 추론할 수 있습니다.
+
+```cpp
+#include <torch/script.h>
+
+int main() {
+    // 1. 정책 로드 (1회)
+    torch::jit::script::Module policy = torch::jit::load("policy.pt");
+
+    // 2. 로봇 제어 루프 (50~400 Hz)
+    while (running) {
+        // 센서 데이터 수집 (48차원)
+        // - IMU: 가속도(3) + 자이로(3) + 중력방향(3)
+        // - 관절: 각도(12) + 각속도(12)
+        // - 명령: 목표 속도(3)
+        auto obs = get_robot_observation();  // [1, 48] 텐서
+
+        // 신경망 추론 → 12차원 (관절 목표 위치)
+        auto action = policy.forward({obs}).toTensor();
+
+        // PD 컨트롤러가 목표 위치를 토크로 변환
+        robot.setJointPositionTargets(action);
+    }
+}
+```
+
+<b>적합한 경우</b>: 연구/프로토타입, PyTorch 생태계 활용, GPU 서버에서 추론
+
+### policy.onnx 사용법 — Jetson 배포
+
+NVIDIA Jetson (Orin, Xavier)에서 TensorRT로 최적화하면 sub-millisecond 추론이 가능합니다.
+
+```bash
+# Step 1: ONNX → TensorRT 엔진 변환 (Jetson에서 1회 실행)
+/usr/src/tensorrt/bin/trtexec \
+    --onnx=policy.onnx \
+    --saveEngine=policy.engine \
+    --fp16    # FP16 반정밀도로 2배 빠른 추론
+```
+
+```python
+# Step 2: TensorRT 엔진으로 실시간 추론
+import tensorrt as trt
+import pycuda.driver as cuda
+import numpy as np
+
+# 엔진 로드 (1회)
+runtime = trt.Runtime(trt.Logger())
+with open("policy.engine", "rb") as f:
+    engine = runtime.deserialize_cuda_engine(f.read())
+context = engine.create_execution_context()
+
+# 로봇 제어 루프
+while running:
+    obs = get_robot_observation()       # numpy array [1, 48]
+    cuda.memcpy_htod(d_input, obs)      # CPU → GPU
+    context.execute_v2([d_input, d_output])
+    cuda.memcpy_dtoh(action, d_output)  # GPU → CPU  (~0.1ms)
+    robot.set_joint_targets(action)     # 모터 제어
+```
+
+<b>적합한 경우</b>: 프로덕션 배포, Jetson/ARM 디바이스, 배터리 효율 중요
+
+### 두 포맷 비교
+
+| | policy.pt (JIT) | policy.onnx → TensorRT |
+|---|---|---|
+| <b>대상 하드웨어</b> | PC, 서버, Jetson (PyTorch) | Jetson, ARM 엣지 디바이스 |
+| <b>추론 속도</b> | ~1-2ms | ~0.1ms |
+| <b>의존성</b> | libtorch (~300 MB) | TensorRT (Jetson 내장) |
+| <b>정밀도</b> | FP32 | FP16/INT8 선택 가능 |
+| <b>제어 주파수</b> | ~200 Hz | ~400+ Hz |
+| <b>권장 용도</b> | 연구, 프로토타입 | <b>프로덕션 배포</b> |
+
+> 제어 주파수가 높을수록 로봇이 더 빠르게 반응하여 안정적으로 보행할 수 있습니다. 실제 ANYmal-C는 200~400 Hz 제어 루프를 사용합니다.
+
+### 실제 ANYmal-C 배포 구성
+
+```
+┌─────────────────────────────────┐
+│  ANYmal-C 로봇                   │
+│                                  │
+│  ┌──────────────────────┐       │
+│  │ NVIDIA Jetson Orin   │       │
+│  │                      │       │
+│  │  policy.engine       │       │
+│  │  (TensorRT FP16)     │       │
+│  │       ↑       ↓      │       │
+│  │   48차원 obs  12차원 action  │
+│  └──────┬───────┬───────┘       │
+│         │       │                │
+│    IMU/관절   PD 컨트롤러        │
+│    센서        → 12개 모터       │
+└─────────────────────────────────┘
+
+입력 (48차원):
+  - 기본 각속도 (3)
+  - 중력 벡터 (3)
+  - 속도 명령 (3)
+  - 관절 각도 (12)
+  - 관절 각속도 (12)
+  - 이전 행동 (12)
+  - 높이 스캔 (선택)
+
+출력 (12차원):
+  - RF_HAA, RF_HFE, RF_KFE  (오른쪽 앞다리)
+  - LF_HAA, LF_HFE, LF_KFE  (왼쪽 앞다리)
+  - RH_HAA, RH_HFE, RH_KFE  (오른쪽 뒷다리)
+  - LH_HAA, LH_HFE, LH_KFE  (왼쪽 뒷다리)
+```
+
+---
+
+## 6.7 비디오를 로컬로 다운로드
 
 ```bash
 # EC2에서 로컬로 비디오 복사
@@ -167,7 +304,7 @@ scp -i dev-ap-northeast-2.pem \
 
 ***
 
-## 6.7 (선택) Nice DCV로 실시간 시각화
+## 6.8 (선택) Nice DCV로 실시간 시각화
 
 headless 비디오 대신 실시간으로 로봇을 보고 싶다면:
 
@@ -186,6 +323,7 @@ headless 비디오 대신 실시간으로 로봇을 보고 싶다면:
 * [ ] 비디오에서 로봇이 rough terrain 위를 걷는 모습 확인
 * [ ] `policy.pt` (JIT)과 `policy.onnx` export 파일 확인
 * [ ] 각 산출물의 용도(학습 재개 vs 실제 로봇 배포)를 이해
+* [ ] JIT vs ONNX/TensorRT 차이와 실제 로봇 배포 흐름을 이해
 
 ***
 
