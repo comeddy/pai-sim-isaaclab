@@ -138,12 +138,7 @@ action = session.run(None, {"obs": observation})[0]
 
 ## 6.5 산출물 비교
 
-| 산출물              | 크기     | 형태              | 실제 로봇 활용           |
-| ---------------- | ------ | --------------- | ------------------ |
-| `model_1499.pt`  | 6.6 MB | PyTorch 체크포인트   | 학습 재개, fine-tuning |
-| `policy.pt`      | 1.2 MB | TorchScript JIT | C++ 실시간 추론         |
-| `policy.onnx`    | 1.1 MB | ONNX            | TensorRT/Jetson 추론 |
-| `rl-video-*.mp4` | 2.8 MB | MP4 비디오         | 시각적 검증, 발표 자료      |
+<table><thead><tr><th width="160.38671875">산출물</th><th width="97.21484375">크기</th><th>형태</th><th>실제 로봇 활용</th></tr></thead><tbody><tr><td><code>model_1499.pt</code></td><td>6.6 MB</td><td>PyTorch 체크포인트</td><td>학습 재개, fine-tuning</td></tr><tr><td><code>policy.pt</code></td><td>1.2 MB</td><td>TorchScript JIT</td><td>C++ 실시간 추론</td></tr><tr><td><code>policy.onnx</code></td><td>1.1 MB</td><td>ONNX</td><td>TensorRT/Jetson 추론</td></tr><tr><td><code>rl-video-*.mp4</code></td><td>2.8 MB</td><td>MP4 비디오</td><td>시각적 검증, 발표 자료</td></tr></tbody></table>
 
 > ✅ SUCCESS
 >
@@ -153,7 +148,7 @@ action = session.run(None, {"obs": observation})[0]
 
 ## 6.6 Sim-to-Real: 실제 로봇에 정책 배포하기
 
-Export된 정책 파일은 **실제 물리 로봇의 온보드 컴퓨터**에서 실행하기 위한 것입니다. 시뮬레이션에서 학습한 "뇌"를 로봇에 이식하는 과정이 <b>Sim-to-Real Transfer</b>의 핵심입니다.
+Export된 정책 파일은 **실제 물리 로봇의 온보드 컴퓨터**에서 실행하기 위한 것입니다. 시뮬레이션에서 학습한 "뇌"를 로봇에 이식하는 과정이 Sim-to-Real Transfer의 핵심입니다.
 
 ### 전체 파이프라인
 
@@ -201,7 +196,7 @@ int main() {
 }
 ```
 
-<b>적합한 경우</b>: 연구/프로토타입, PyTorch 생태계 활용, GPU 서버에서 추론
+적합한 경우: 연구/프로토타입, PyTorch 생태계 활용, GPU 서버에서 추론
 
 ### policy.onnx 사용법 — Jetson 배포
 
@@ -236,20 +231,20 @@ while running:
     robot.set_joint_targets(action)     # 모터 제어
 ```
 
-<b>적합한 경우</b>: 프로덕션 배포, Jetson/ARM 디바이스, 배터리 효율 중요
+적합한 경우: 프로덕션 배포, Jetson/ARM 디바이스, 배터리 효율 중요
 
 ### 두 포맷 비교
 
-| | policy.pt (JIT) | policy.onnx → TensorRT |
-|---|---|---|
-| <b>대상 하드웨어</b> | PC, 서버, Jetson (PyTorch) | Jetson, ARM 엣지 디바이스 |
-| <b>추론 속도</b> | ~1-2ms | ~0.1ms |
-| <b>의존성</b> | libtorch (~300 MB) | TensorRT (Jetson 내장) |
-| <b>정밀도</b> | FP32 | FP16/INT8 선택 가능 |
-| <b>제어 주파수</b> | ~200 Hz | ~400+ Hz |
-| <b>권장 용도</b> | 연구, 프로토타입 | <b>프로덕션 배포</b> |
+|         | policy.pt (JIT)          | policy.onnx → TensorRT |
+| ------- | ------------------------ | ---------------------- |
+| 대상 하드웨어 | PC, 서버, Jetson (PyTorch) | Jetson, ARM 엣지 디바이스    |
+| 추론 속도   | \~1-2ms                  | \~0.1ms                |
+| 의존성     | libtorch (\~300 MB)      | TensorRT (Jetson 내장)   |
+| 정밀도     | FP32                     | FP16/INT8 선택 가능        |
+| 제어 주파수  | \~200 Hz                 | \~400+ Hz              |
+| 권장 용도   | 연구, 프로토타입                | 프로덕션 배포                |
 
-> 제어 주파수가 높을수록 로봇이 더 빠르게 반응하여 안정적으로 보행할 수 있습니다. 실제 ANYmal-C는 200~400 Hz 제어 루프를 사용합니다.
+> 제어 주파수가 높을수록 로봇이 더 빠르게 반응하여 안정적으로 보행할 수 있습니다. 실제 ANYmal-C는 200\~400 Hz 제어 루프를 사용합니다.
 
 ### 실제 ANYmal-C 배포 구성
 
@@ -286,7 +281,7 @@ while running:
   - LH_HAA, LH_HFE, LH_KFE  (왼쪽 뒷다리)
 ```
 
----
+***
 
 ## 6.7 비디오를 로컬로 다운로드
 
