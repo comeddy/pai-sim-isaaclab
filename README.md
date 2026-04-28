@@ -1,118 +1,78 @@
-# Physical AI Workshop: $12로 로봇 걷게 만들기
+# pai-sim-isaaclab
 
-> Isaac Lab + PPO로 ANYmal-C 로봇이 거친 지형에서 걷는 법을 학습하는 전체 과정을 담았습니다. Terraform 한 줄로 AWS GPU 인프라를 구축하고, 75분 만에 1.47억 timestep을 학습합니다.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Terraform](https://img.shields.io/badge/Terraform-%3E%3D1.5-623CE4.svg)](https://www.terraform.io/)
+[![Isaac Lab](https://img.shields.io/badge/Isaac%20Lab-v2.1.0-76B900.svg)](https://isaac-sim.github.io/IsaacLab/)
+[![Isaac Sim](https://img.shields.io/badge/Isaac%20Sim-4.5.0-76B900.svg)](https://developer.nvidia.com/isaac-sim)
+<a href="#english"><img src="https://img.shields.io/badge/lang-English-blue.svg" alt="English"></a>
+<a href="#한국어"><img src="https://img.shields.io/badge/lang-한국어-red.svg" alt="Korean"></a>
 
-<figure><img src=".gitbook/assets/play30_frame_15s (1).png" alt=""><figcaption></figcaption></figure>
+**End-to-end pipeline for training quadruped robot locomotion with reinforcement learning on AWS GPU instances using NVIDIA Isaac Lab**
 
-<p align="center"><em>학습된 ANYmal-C가 울퉁불퉁한 블록 지형 위를 안정적으로 보행하는 모습 (클릭하여 영상 재생)</em></p>
+**Terraform으로 AWS GPU 인프라를 구축하고 NVIDIA Isaac Lab에서 4족 보행 로봇의 강화학습을 실행하는 엔드투엔드 파이프라인**
 
-***
+---
 
-## 하이라이트
+# English
 
-| 항목      | 결과                                  |
-| ------- | ----------------------------------- |
-| 로봇      | ANYmal-C 4족 보행 (12 관절)              |
-| 환경      | Rough Terrain (바위, 경사면, 계단)         |
-| 알고리즘    | PPO (Proximal Policy Optimization)  |
-| 병렬 환경 수 | 4,096개 동시 시뮬레이션                     |
-| 훈련 시간   | 75분 / 1,500 iterations              |
-| 최종 보상   | -0.50 → +16.29                      |
-| 에피소드 길이 | 13 steps → 897 steps (×66배)         |
-| 지형 난이도  | Level 5.9 / 6.25 도달                 |
-| 총 비용    | \~$12 (₩16,000)                     |
-| 산출물     | MP4 비디오 + JIT/ONNX 정책 (sim-to-real) |
+## Overview
 
-***
+pai-sim-isaaclab is an end-to-end pipeline that provisions AWS GPU infrastructure with Terraform and trains an ANYmal-C quadruped robot to walk over rough terrain using PPO reinforcement learning in NVIDIA Isaac Lab. The entire process — from infrastructure deployment to trained policy export — completes in under 2 hours for approximately $12.
 
-## 프로젝트 구조
+A step-by-step Korean workshop (7 Labs + 3 Appendices) guides users through every stage, from Terraform deployment to Sim-to-Real policy export.
 
-```
-pai-sim-isaaclab/
-│
-├── main.tf                    # Terraform: VPC, EC2, EBS, IAM, CloudWatch
-├── variables.tf               # 입력 변수 정의
-├── outputs.tf                 # 출력 (IP, SSH 명령어)
-├── terraform.tfvars.example   # 변수 예제 (복사해서 사용)
-├── user_data.sh               # EC2 부팅 스크립트 (Docker, Isaac Lab 자동 설치)
-│
-├── REPORT_Physical_AI_on_AWS.md   # 종합 실습 리포트
-├── isaac_lab_dashboard.html       # 훈련 메트릭 대시보드 (Chart.js)
-│
-├── images/                    # 스크린샷 & 프레임 캡처
-│   ├── dashboard_screenshot*.png  # 훈련 대시보드 캡처 (3장)
-│   ├── play30_frame_*.png         # Play 모드 프레임 (7장)
-│   └── play_frame_*.png           # 초기 Play 프레임 (5장)
-│
-├── models/                    # 학습된 정책 모델
-│   ├── policy_jit.pt              # TorchScript JIT (C++ 추론용)
-│   └── policy.onnx                # ONNX (TensorRT/Jetson용)
-│
-├── videos/                    # Play 모드 녹화 영상
-│   ├── anymal_c_play.mp4          # 10초 테스트 영상
-│   └── anymal_c_play_30s.mp4      # 30초 최종 영상
-│
-└── workshop/                  # GitBook 포맷 워크샵 (7 Lab + 3 Appendix)
-    ├── README.md
-    ├── SUMMARY.md
-    ├── book.json
-    ├── assets/                # 스크린샷, 프레임 캡처
-    └── chapters/
-        ├── 01-concepts.md             # Physical AI 핵심 개념
-        ├── 02-infrastructure.md       # AWS GPU 인프라 구축
-        ├── 03-docker-build.md         # Isaac Lab Docker 빌드
-        ├── 04-training.md             # PPO 강화학습 훈련
-        ├── 05-results.md              # 학습 결과 분석
-        ├── 06-play-mode.md            # Play 모드 & Policy Export
-        ├── 07-cleanup.md              # 정리 & 다음 단계
-        ├── appendix-a-troubleshooting.md  # 실전 트러블슈팅 12선
-        ├── appendix-b-cost.md             # 비용 분석 & 최적화
-        └── appendix-c-references.md       # SW 버전, 논문, 용어
-```
+<p align="center">
+  <img src=".gitbook/assets/play30_frame_15s (1).png" alt="ANYmal-C walking on rough terrain" width="720">
+  <br>
+  <em>Trained ANYmal-C walking stably on rough block terrain</em>
+</p>
 
-***
+## Features
 
-## 아키텍처
+- **One-command GPU infrastructure** — Terraform provisions VPC, g6e.4xlarge EC2 (NVIDIA L40S), EBS volumes, IAM roles, and CloudWatch alarms in a single `terraform apply`.
+- **Automated environment bootstrap** — `user_data.sh` handles NGC login, Isaac Sim Docker pull, Isaac Lab source build, and wrapper script generation without manual intervention.
+- **PPO reinforcement learning** — Trains ANYmal-C locomotion with 4,096 parallel environments, reaching +16.29 mean reward in 75 minutes / 1,500 iterations.
+- **Sim-to-Real policy export** — Exports trained policies as TorchScript JIT (`.pt`) and ONNX (`.onnx`) for deployment on physical robots via TensorRT/Jetson.
+- **Cost-optimized operation** — CloudWatch GPU idle detection auto-stops instances after 30 minutes; S3 checkpoint sync protects against Spot interruptions.
 
-<figure><img src=".gitbook/assets/architecture.png" alt=""><figcaption></figcaption></figure>
+## Prerequisites
 
-***
+- [Terraform](https://developer.hashicorp.com/terraform/install) >= 1.5
+- [AWS CLI](https://aws.amazon.com/cli/) configured with appropriate credentials
+- [NVIDIA NGC](https://ngc.nvidia.com/) API Key
+- g6e instance service quota approved ([Service Quotas](https://console.aws.amazon.com/servicequotas/))
+- SSH key pair for EC2 access
 
-## 빠른 시작
-
-### 사전 요구 사항
-
-* [Terraform](https://developer.hashicorp.com/terraform/install) >= 1.5
-* AWS CLI 구성 (`aws configure`)
-* [NVIDIA NGC](https://ngc.nvidia.com/) API Key
-* g6e 인스턴스 서비스 한도 승인 ([Service Quotas](https://console.aws.amazon.com/servicequotas/))
-
-### 1. 인프라 배포
+## Installation
 
 ```bash
-# 변수 파일 생성
-cp terraform.tfvars.example terraform.tfvars
-# terraform.tfvars 편집 — NGC API Key, SSH 키, 리전 등
+# Clone the repository
+git clone https://github.com/comeddy/pai-sim-isaaclab.git
+cd pai-sim-isaaclab
 
-# 배포 (~3분)
+# Copy and configure Terraform variables
+cp terraform.tfvars.example terraform.tfvars
+# Edit terraform.tfvars — set NGC API key, SSH key, region, etc.
+
+# Initialize and deploy infrastructure (~3 minutes)
 terraform init
 terraform plan
 terraform apply
 ```
 
-### 2. SSH 접속 & 부팅 확인
+## Usage
+
+### SSH into the instance and verify boot
 
 ```bash
 ssh -i your-key.pem ubuntu@$(terraform output -raw public_ip)
 
-# 부팅 스크립트 진행 확인 (15-25분 소요)
+# Monitor bootstrap progress (15-25 minutes)
 tail -f /var/log/isaac-lab-setup.log
-# "Isaac Lab setup COMPLETE" 메시지 확인
+# Wait for "Isaac Lab setup COMPLETE" message
 ```
 
-### 3. Isaac Lab Docker 이미지 완성
-
-`user_data.sh`가 Isaac Sim pull + Isaac Lab 빌드를 자동 수행합니다. 단, 코어 `isaaclab` 패키지 수동 설치가 필요합니다:
+### Install core isaaclab package (required one-time step)
 
 ```bash
 docker run --name setup --gpus all \
@@ -126,9 +86,7 @@ docker commit setup isaac-lab-ready:latest
 docker rm setup
 ```
 
-> 왜? `docker compose --profile base build`는 extension 패키지만 설치하고 코어 `isaaclab` 패키지를 누락합니다. 이 단계 없이는 `ModuleNotFoundError: No module named 'isaaclab'`이 발생합니다.
-
-### 4. 훈련 실행
+### Run PPO training
 
 ```bash
 docker run --rm --gpus all --network=host \
@@ -140,11 +98,10 @@ docker run --rm --gpus all --network=host \
   -p scripts/reinforcement_learning/rsl_rl/train.py \
     --task Isaac-Velocity-Rough-Anymal-C-v0 \
     --headless
+# Training takes ~75 minutes for 1,500 iterations
 ```
 
-> 중요: `--entrypoint` 오버라이드 필수! 기본 entrypoint(`runheadless.sh`)는 스트리밍 서버 모드입니다.
-
-### 5. Play 모드 (학습된 정책 시각화)
+### Run Play mode and export policy
 
 ```bash
 docker run --rm --gpus all --network=host \
@@ -157,118 +114,295 @@ docker run --rm --gpus all --network=host \
     --task Isaac-Velocity-Rough-Anymal-C-v0 \
     --headless --video --video_length 1500 --num_envs 16 \
     --load_run <TIMESTAMP_DIR>
+# Outputs: rl-video-step-0.mp4, exported/policy.pt, exported/policy.onnx
 ```
 
-산출물:
-
-* `rl-video-step-0.mp4` — 보행 비디오 (30초, 1280×720)
-* `exported/policy.pt` — TorchScript JIT (C++ 실시간 추론)
-* `exported/policy.onnx` — ONNX (TensorRT/Jetson 배포)
-
-### 6. 정리
+### Clean up all resources
 
 ```bash
-terraform destroy   # 모든 AWS 리소스 일괄 삭제
+terraform destroy
 ```
 
-***
+## Configuration
 
-## 훈련 결과
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `aws_region` | AWS region (must support g6e instances) | `us-east-1` |
+| `project_name` | Project name for resource naming and tagging | `isaac-lab` |
+| `isaac_lab_version` | Isaac Lab release tag | `v2.1.0` |
+| `isaac_sim_version` | Isaac Sim container tag on NGC | `4.5.0` |
+| `ngc_api_key` | NVIDIA NGC API key (sensitive) | — |
+| `root_volume_size_gb` | Root EBS volume size (OS + Docker images) | `300` |
+| `data_volume_size_gb` | Data EBS volume size (datasets + checkpoints) | `500` |
+| `checkpoint_bucket` | S3 bucket name for checkpoint sync | `isaac-lab-checkpoints` |
+| `enable_idle_stop` | Auto-stop instance when GPU idle for 30 min | `true` |
+| `allowed_ssh_cidrs` | CIDR blocks allowed to SSH | `["0.0.0.0/0"]` |
 
-### 학습 곡선
+## Project Structure
 
-| Phase | Iterations | Mean Reward   | 설명                |
-| ----- | ---------- | ------------- | ----------------- |
-| 탐색기   | 0-40       | -0.5 → -4.9   | 랜덤 탐색, 패널티 활성화    |
-| 기초 학습 | 40-120     | -4.9 → +5.0   | 보행 패턴 습득, 보상 0 돌파 |
-| 정교화   | 120-300    | +5.0 → +15.0  | 안정적 보행, 속도 추적 향상  |
-| 수렴    | 300-1500   | +15.0 → +16.3 | 정책 수렴, 지형 난이도 상승  |
+```
+pai-sim-isaaclab/
+├── main.tf                       # Terraform: VPC, EC2, EBS, IAM, CloudWatch
+├── variables.tf                  # Input variable definitions
+├── outputs.tf                    # Outputs (IP, SSH command)
+├── terraform.tfvars.example      # Variable template (copy to terraform.tfvars)
+├── user_data.sh                  # EC2 bootstrap (Docker, Isaac Lab auto-install)
+├── docs/                         # Architecture docs, ADRs, runbooks
+│   ├── architecture.md           # System architecture (bilingual)
+│   ├── decisions/                # Architecture Decision Records
+│   ├── runbooks/                 # Operational runbooks
+│   └── onboarding.md            # Developer onboarding guide
+├── workshop/                     # HonKit workshop (7 Labs + 3 Appendices)
+│   ├── SUMMARY.md               # Table of contents
+│   ├── book.json                # HonKit configuration
+│   └── chapters/                # Markdown content per lab
+├── models/                       # Trained policy models
+│   ├── policy_jit.pt            # TorchScript JIT (C++ inference)
+│   └── policy.onnx              # ONNX (TensorRT/Jetson deployment)
+├── videos/                       # Play mode recordings
+├── images/                       # Dashboard screenshots, frame captures
+├── isaac_lab_dashboard.html      # Chart.js training metrics dashboard
+├── scripts/                      # Setup and deployment scripts
+├── tests/                        # Harness engineering tests
+└── .claude/                      # Claude Code settings, hooks, skills
+```
 
-### 대시보드
-
-<figure><img src=".gitbook/assets/dashboard_screenshot.png" alt=""><figcaption></figcaption></figure>
-
-<figure><img src=".gitbook/assets/image.png" alt=""><figcaption></figcaption></figure>
-
-<figure><img src=".gitbook/assets/dashboard_screenshot3.png" alt=""><figcaption></figcaption></figure>
-
-### Play 모드
-
-<figure><img src=".gitbook/assets/play_video_thumbnail.jpg" alt=""><figcaption></figcaption></figure>
-
-<p align="center"><em>ANYmal-C rough terrain locomotion (30s) — 클릭하여 YouTube에서 재생</em></p>
-
-***
-
-## 실전 트러블슈팅 12선
-
-이 프로젝트에서 실제로 겪은 12가지 함정입니다. 공식 문서에 없는 실전 지식:
-
-<table><thead><tr><th width="91.2109375">#</th><th width="261.42578125">함정</th><th width="84.4140625">심각도</th><th>핵심 해결법</th></tr></thead><tbody><tr><td>1</td><td>dpkg lock 경합</td><td>🟡</td><td><code>systemctl stop unattended-upgrades</code> + <code>DPkg::Lock::Timeout=120</code></td></tr><tr><td>2</td><td>EBS 디바이스 이름 (Nitro)</td><td>🟡</td><td><code>/dev/nvme*n1</code> 동적 탐색 (xvdf 아님)</td></tr><tr><td>3</td><td>Instance store 이미 마운트</td><td>🟡</td><td><code>/opt/dlami/nvme</code> 재활용</td></tr><tr><td>4</td><td>Terraform templatefile 충돌</td><td>🟡</td><td><code>$${VAR}</code> double dollar 이스케이프</td></tr><tr><td>5</td><td>user_data 재실행 안 됨</td><td>🟢</td><td><code>terraform taint</code> → 인스턴스 재생성</td></tr><tr><td>6</td><td>Isaac Lab NGC 이미지 없음</td><td>🔴</td><td>소스에서 <code>docker compose --profile base build</code></td></tr><tr><td>7</td><td>코어 isaaclab 패키지 누락</td><td>🔴</td><td><code>pip install --no-build-isolation -e source/isaaclab</code></td></tr><tr><td>8</td><td>Docker entrypoint 스트리밍 모드</td><td>🔴</td><td><code>--entrypoint /workspace/isaaclab/isaaclab.sh</code></td></tr><tr><td>9</td><td>훈련 스크립트 경로 변경 (v2.1.0)</td><td>🟡</td><td><code>scripts/reinforcement_learning/rsl_rl/train.py</code></td></tr><tr><td>10</td><td>setuptools 빌드 격리</td><td>🔴</td><td><code>--no-build-isolation</code> 플래그</td></tr><tr><td>11</td><td>Volume mount → editable install 파괴</td><td>🟡</td><td>소스 디렉토리 마운트 금지</td></tr><tr><td>12</td><td>셰이더 캐시 첫 실행 4분 지연</td><td>🟢</td><td>캐시 볼륨 마운트 + 인내심</td></tr></tbody></table>
-
-> 자세한 내용은 [workshop/chapters/appendix-a-troubleshooting.md](workshop/chapters/appendix-a-troubleshooting.md) 참조
-
-***
-
-## 비용
-
-| 시나리오   | 인스턴스                  | 리전       | 예상 비용   |
-| ------ | --------------------- | -------- | ------- |
-| 이번 실습  | g6e.4xlarge On-Demand | Seoul    | \~$12   |
-| 비용 최적화 | g6e.4xlarge Spot      | Virginia | \~$2.50 |
-| 대규모    | g6e.12xlarge Spot     | Virginia | \~$8    |
-
-비용 절약 기능:
-
-* GPU idle 30분 → CloudWatch 자동 Stop
-* S3 체크포인트 자동 동기화 (Spot 중단 대비)
-
-***
-
-## 워크샵
-
-GitBook 포맷의 단계별 워크샵이 `workshop/` 디렉토리에 포함되어 있습니다:
+## Testing
 
 ```bash
-cd workshop
-npm install honkit
-npx honkit serve
-# http://localhost:4000 에서 확인
+# Run the full harness test suite
+bash tests/run-all.sh
+
+# Run only hook tests
+bash tests/run-all.sh hooks
+
+# Run only structure tests
+bash tests/run-all.sh structure
+
+# Validate Terraform configuration
+terraform validate
+terraform fmt -check
 ```
 
-| Lab        | 내용                       | 소요 시간 |
-| ---------- | ------------------------ | ----- |
-| Lab 1      | Physical AI 핵심 개념        | 10분   |
-| Lab 2      | Terraform AWS GPU 인프라 구축 | 20분   |
-| Lab 3      | Isaac Lab Docker 이미지 빌드  | 30분   |
-| Lab 4      | PPO 강화학습 훈련              | 75분   |
-| Lab 5      | 학습 결과 분석                 | 15분   |
-| Lab 6      | Play 모드 & Policy Export  | 10분   |
-| Lab 7      | 정리 & 다음 단계               | 10분   |
-| Appendix A | 실전 트러블슈팅 12선             | —     |
-| Appendix B | 비용 분석 & 최적화              | —     |
-| Appendix C | SW 버전, 논문, 용어 사전         | —     |
+## Contributing
 
-***
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feat/amazing-feature`)
+3. Commit changes using Conventional Commits (`git commit -m 'feat: add amazing feature'`)
+4. Push to the branch (`git push origin feat/amazing-feature`)
+5. Open a Pull Request
 
-## 소프트웨어 버전
+Commit message examples:
 
-| 소프트웨어         | 버전         |
-| ------------- | ---------- |
-| Ubuntu        | 22.04 LTS  |
-| NVIDIA Driver | 580.126.09 |
-| Isaac Sim     | 4.5.0      |
-| Isaac Lab     | v2.1.0     |
-| PyTorch       | 2.5.1      |
-| RSL-RL        | 2.x        |
-| Terraform     | >= 1.5     |
+```
+feat: add Spot instance support for cost optimization
+fix: resolve EBS mount failure on Nitro instances
+docs: update training parameters in Lab 4
+```
 
-***
+## License
+
+This project's Terraform code and workshop documentation are released under the [MIT License](LICENSE). Isaac Sim / Isaac Lab are subject to the [NVIDIA EULA](https://docs.omniverse.nvidia.com/isaacsim/latest/common/NVIDIA_Omniverse_License_Agreement.html).
+
+## Contact
+
+- Maintainer: [@comeddy](https://github.com/comeddy)
+- Issues: [GitHub Issues](https://github.com/comeddy/pai-sim-isaaclab/issues)
+
+---
+
+# 한국어
+
+## 개요
+
+pai-sim-isaaclab은 Terraform으로 AWS GPU 인프라를 프로비저닝하고, NVIDIA Isaac Lab에서 PPO 강화학습을 사용하여 ANYmal-C 4족 보행 로봇이 거친 지형 위를 걷도록 훈련하는 엔드투엔드 파이프라인입니다. 인프라 배포부터 학습된 정책 추출까지 전체 과정이 약 2시간, 약 $12(₩16,000)에 완료됩니다.
+
+단계별 한국어 워크샵(7개 Lab + 3개 부록)이 Terraform 배포부터 Sim-to-Real 정책 추출까지 모든 과정을 안내합니다.
+
+<p align="center">
+  <img src=".gitbook/assets/play30_frame_15s (1).png" alt="ANYmal-C 거친 지형 보행" width="720">
+  <br>
+  <em>학습된 ANYmal-C가 울퉁불퉁한 블록 지형 위를 안정적으로 보행하는 모습</em>
+</p>
+
+## 주요 기능
+
+- **원커맨드 GPU 인프라** — Terraform이 VPC, g6e.4xlarge EC2(NVIDIA L40S), EBS 볼륨, IAM 역할, CloudWatch 알람을 단일 `terraform apply`로 프로비저닝합니다.
+- **자동 환경 부트스트랩** — `user_data.sh`가 NGC 로그인, Isaac Sim Docker pull, Isaac Lab 소스 빌드, 래퍼 스크립트 생성을 수동 개입 없이 처리합니다.
+- **PPO 강화학습** — 4,096개 병렬 환경에서 ANYmal-C 보행을 학습하여, 75분 / 1,500 이터레이션 만에 평균 보상 +16.29에 도달합니다.
+- **Sim-to-Real 정책 추출** — 학습된 정책을 TorchScript JIT(`.pt`)와 ONNX(`.onnx`)로 추출하여 TensorRT/Jetson을 통해 실제 로봇에 배포할 수 있습니다.
+- **비용 최적화 운영** — CloudWatch GPU 유휴 감지가 30분 후 자동으로 인스턴스를 중지하며, S3 체크포인트 동기화가 Spot 중단에 대비합니다.
+
+## 사전 요구 사항
+
+- [Terraform](https://developer.hashicorp.com/terraform/install) >= 1.5
+- [AWS CLI](https://aws.amazon.com/cli/) 적절한 자격 증명으로 구성
+- [NVIDIA NGC](https://ngc.nvidia.com/) API Key
+- g6e 인스턴스 서비스 한도 승인 ([Service Quotas](https://console.aws.amazon.com/servicequotas/))
+- EC2 접속용 SSH 키 페어
+
+## 설치 방법
+
+```bash
+# 저장소 클론
+git clone https://github.com/comeddy/pai-sim-isaaclab.git
+cd pai-sim-isaaclab
+
+# Terraform 변수 파일 복사 및 설정
+cp terraform.tfvars.example terraform.tfvars
+# terraform.tfvars 편집 — NGC API Key, SSH 키, 리전 등 설정
+
+# 인프라 초기화 및 배포 (~3분)
+terraform init
+terraform plan
+terraform apply
+```
+
+## 사용법
+
+### SSH 접속 및 부팅 확인
+
+```bash
+ssh -i your-key.pem ubuntu@$(terraform output -raw public_ip)
+
+# 부트스트랩 진행 상황 모니터링 (15-25분)
+tail -f /var/log/isaac-lab-setup.log
+# "Isaac Lab setup COMPLETE" 메시지 확인
+```
+
+### 코어 isaaclab 패키지 설치 (최초 1회 필수)
+
+```bash
+docker run --name setup --gpus all \
+  -e "ACCEPT_EULA=Y" -e "PRIVACY_CONSENT=Y" \
+  --entrypoint bash isaac-lab-base:latest -c '
+    /workspace/isaaclab/_isaac_sim/python.sh -m pip install \
+      --no-build-isolation -e /workspace/isaaclab/source/isaaclab
+    cd /workspace/isaaclab && ./isaaclab.sh -i rsl_rl
+  '
+docker commit setup isaac-lab-ready:latest
+docker rm setup
+```
+
+### PPO 훈련 실행
+
+```bash
+docker run --rm --gpus all --network=host \
+  --entrypoint /workspace/isaaclab/isaaclab.sh \
+  -e "ACCEPT_EULA=Y" -e "PRIVACY_CONSENT=Y" \
+  -v "/scratch/isaac-sim-cache/kit:/isaac-sim/kit/cache:rw" \
+  -v "/data/checkpoints:/workspace/isaaclab/logs:rw" \
+  isaac-lab-ready:latest \
+  -p scripts/reinforcement_learning/rsl_rl/train.py \
+    --task Isaac-Velocity-Rough-Anymal-C-v0 \
+    --headless
+# 1,500 이터레이션 기준 약 75분 소요
+```
+
+### Play 모드 실행 및 정책 추출
+
+```bash
+docker run --rm --gpus all --network=host \
+  --entrypoint /workspace/isaaclab/isaaclab.sh \
+  -e "ACCEPT_EULA=Y" -e "PRIVACY_CONSENT=Y" \
+  -v "/scratch/isaac-sim-cache/kit:/isaac-sim/kit/cache:rw" \
+  -v "/data/checkpoints:/workspace/isaaclab/logs:rw" \
+  isaac-lab-ready:latest \
+  -p scripts/reinforcement_learning/rsl_rl/play.py \
+    --task Isaac-Velocity-Rough-Anymal-C-v0 \
+    --headless --video --video_length 1500 --num_envs 16 \
+    --load_run <TIMESTAMP_DIR>
+# 산출물: rl-video-step-0.mp4, exported/policy.pt, exported/policy.onnx
+```
+
+### 전체 리소스 정리
+
+```bash
+terraform destroy
+```
+
+## 환경 설정
+
+| 변수 | 설명 | 기본값 |
+|------|------|--------|
+| `aws_region` | AWS 리전 (g6e 인스턴스 지원 리전) | `us-east-1` |
+| `project_name` | 리소스 네이밍 및 태깅용 프로젝트명 | `isaac-lab` |
+| `isaac_lab_version` | Isaac Lab 릴리스 태그 | `v2.1.0` |
+| `isaac_sim_version` | NGC의 Isaac Sim 컨테이너 태그 | `4.5.0` |
+| `ngc_api_key` | NVIDIA NGC API 키 (민감 정보) | — |
+| `root_volume_size_gb` | Root EBS 볼륨 크기 (OS + Docker 이미지) | `300` |
+| `data_volume_size_gb` | Data EBS 볼륨 크기 (데이터셋 + 체크포인트) | `500` |
+| `checkpoint_bucket` | 체크포인트 동기화용 S3 버킷명 | `isaac-lab-checkpoints` |
+| `enable_idle_stop` | GPU 30분 유휴 시 자동 중지 | `true` |
+| `allowed_ssh_cidrs` | SSH 허용 CIDR 블록 | `["0.0.0.0/0"]` |
+
+## 프로젝트 구조
+
+```
+pai-sim-isaaclab/
+├── main.tf                       # Terraform: VPC, EC2, EBS, IAM, CloudWatch
+├── variables.tf                  # 입력 변수 정의
+├── outputs.tf                    # 출력 (IP, SSH 명령어)
+├── terraform.tfvars.example      # 변수 템플릿 (terraform.tfvars로 복사)
+├── user_data.sh                  # EC2 부트스트랩 (Docker, Isaac Lab 자동 설치)
+├── docs/                         # 아키텍처 문서, ADR, 런북
+│   ├── architecture.md           # 시스템 아키텍처 (이중 언어)
+│   ├── decisions/                # Architecture Decision Records
+│   ├── runbooks/                 # 운영 런북
+│   └── onboarding.md            # 개발자 온보딩 가이드
+├── workshop/                     # HonKit 워크샵 (7개 Lab + 3개 부록)
+│   ├── SUMMARY.md               # 목차
+│   ├── book.json                # HonKit 설정
+│   └── chapters/                # Lab별 마크다운 콘텐츠
+├── models/                       # 학습된 정책 모델
+│   ├── policy_jit.pt            # TorchScript JIT (C++ 추론용)
+│   └── policy.onnx              # ONNX (TensorRT/Jetson 배포용)
+├── videos/                       # Play 모드 녹화 영상
+├── images/                       # 대시보드 스크린샷, 프레임 캡처
+├── isaac_lab_dashboard.html      # Chart.js 훈련 메트릭 대시보드
+├── scripts/                      # 설정 및 배포 스크립트
+├── tests/                        # Harness 엔지니어링 테스트
+└── .claude/                      # Claude Code 설정, hooks, skills
+```
+
+## 테스트
+
+```bash
+# 전체 harness 테스트 스위트 실행
+bash tests/run-all.sh
+
+# hook 테스트만 실행
+bash tests/run-all.sh hooks
+
+# structure 테스트만 실행
+bash tests/run-all.sh structure
+
+# Terraform 구성 검증
+terraform validate
+terraform fmt -check
+```
+
+## 기여 방법
+
+1. 저장소를 Fork합니다
+2. 기능 브랜치를 생성합니다 (`git checkout -b feat/amazing-feature`)
+3. Conventional Commits로 커밋합니다 (`git commit -m 'feat: add amazing feature'`)
+4. 브랜치에 Push합니다 (`git push origin feat/amazing-feature`)
+5. Pull Request를 생성합니다
+
+커밋 메시지 예시:
+
+```
+feat: add Spot instance support for cost optimization
+fix: resolve EBS mount failure on Nitro instances
+docs: update training parameters in Lab 4
+```
 
 ## 라이선스
 
-이 프로젝트의 Terraform 코드와 워크샵 문서는 MIT License로 공개됩니다. Isaac Sim / Isaac Lab은 [NVIDIA EULA](https://docs.omniverse.nvidia.com/isaacsim/latest/common/NVIDIA_Omniverse_License_Agreement.html)를 따릅니다.
+이 프로젝트의 Terraform 코드와 워크샵 문서는 [MIT License](LICENSE)로 공개됩니다. Isaac Sim / Isaac Lab은 [NVIDIA EULA](https://docs.omniverse.nvidia.com/isaacsim/latest/common/NVIDIA_Omniverse_License_Agreement.html)를 따릅니다.
 
-***
+## 연락처
 
-> 이 프로젝트는 2026년 4월 실제 AWS 배포 경험을 기반으로 작성되었습니다. 총 비용 약 ₩16,000으로 4족 보행 로봇의 강화학습을 처음부터 끝까지 완료했습니다.
+- 메인테이너: [@comeddy](https://github.com/comeddy)
+- 이슈: [GitHub Issues](https://github.com/comeddy/pai-sim-isaaclab/issues)

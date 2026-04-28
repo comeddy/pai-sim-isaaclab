@@ -331,3 +331,42 @@ instance_market_options {
 - Spot 인스턴스 블록 주석 해제: 72% 절감
 - `terraform destroy`: 사용 후 즉시 삭제
 - 체크포인트 S3 동기화: Spot 인터럽트 대비
+## Project Structure
+
+```
+.claude/        - Claude 설정, hooks, skills, commands, agents
+docs/           - Architecture docs, ADRs, runbooks
+  decisions/    - Architecture Decision Records
+  runbooks/     - Operational runbooks
+scripts/        - 프로젝트 설정/배포 스크립트
+tests/          - Harness 엔지니어링 테스트
+workshop/       - HonKit 워크샵 문서
+models/         - 학습된 정책 파일
+videos/         - Play 모드 녹화
+images/         - 스크린샷, 프레임 캡처
+```
+
+---
+
+## Auto-Sync Rules
+
+Rules below are applied automatically after Plan mode exit and on major code changes.
+
+### Post-Plan Mode Actions
+After exiting Plan mode (`/plan`), before starting implementation:
+
+1. **Architecture decision made** -> Update `docs/architecture.md`
+2. **Technical choice/trade-off made** -> Create `docs/decisions/ADR-NNN-title.md`
+3. **New module added** -> Create `CLAUDE.md` in that module directory
+4. **Operational procedure defined** -> Create runbook in `docs/runbooks/`
+5. **Changes needed in this file** -> Update relevant sections above
+
+### Code Change Sync Rules
+- Terraform 파일 변경 -> `docs/architecture.md` Infrastructure 섹션 업데이트
+- `user_data.sh` 변경 -> CLAUDE.md의 user_data.sh 섹션 업데이트
+- Workshop 챕터 추가/변경 -> `workshop/CLAUDE.md` 업데이트
+- 인프라 변경 -> `docs/architecture.md` 업데이트
+
+### ADR Numbering
+Find the highest number in `docs/decisions/ADR-*.md` and increment by 1.
+Format: `ADR-NNN-concise-title.md`
