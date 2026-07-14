@@ -29,3 +29,8 @@ node_modules/
 
 # Claude Code
 settings.local.json
+
+# Security scan artifacts (findings snippets contain flagged token patterns)
+scan-report.json
+.playwright-mcp/
+dashboard-verify.png
