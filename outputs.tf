@@ -9,17 +9,17 @@ output "instance_id" {
 
 output "public_ip" {
   description = "Public IP of the Isaac Lab instance"
-  value       = aws_instance.isaac.public_ip
+  value       = aws_eip.isaac.public_ip
 }
 
 output "public_dns" {
   description = "Public DNS of the Isaac Lab instance"
-  value       = aws_instance.isaac.public_dns
+  value       = aws_eip.isaac.public_dns
 }
 
 output "ssh_command" {
   description = "SSH command to connect"
-  value       = var.existing_key_name != "" ? "ssh -i ${var.existing_key_name}.pem ubuntu@${aws_instance.isaac.public_ip}" : "ssh -i isaac-lab-key ubuntu@${aws_instance.isaac.public_ip}"
+  value       = var.existing_key_name != "" ? "ssh -i ${var.existing_key_name}.pem ubuntu@${aws_eip.isaac.public_ip}" : "ssh -i isaac-lab-key ubuntu@${aws_eip.isaac.public_ip}"
 }
 
 output "ssh_private_key" {
@@ -56,7 +56,7 @@ output "quick_start" {
   value       = <<-EOT
 
     # 1. SSH into the instance
-    ssh -i isaac-lab-key ubuntu@${aws_instance.isaac.public_ip}
+    ssh -i isaac-lab-key ubuntu@${aws_eip.isaac.public_ip}
 
     # 2. Check GPU status
     nvidia-smi

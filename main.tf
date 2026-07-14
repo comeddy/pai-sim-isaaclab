@@ -278,9 +278,6 @@ resource "aws_instance" "isaac" {
   vpc_security_group_ids = [aws_security_group.isaac.id]
   iam_instance_profile   = aws_iam_instance_profile.isaac.name
 
-  # Subnet no longer auto-assigns public IPs — request one explicitly for SSH
-  associate_public_ip_address = true
-
   # Root volume — OS + Docker images
   root_block_device {
     volume_size           = var.root_volume_size_gb
@@ -323,6 +320,19 @@ resource "aws_instance" "isaac" {
 
   lifecycle {
     ignore_changes = [ami]
+  }
+}
+
+# Elastic IP — SSH endpoint. The instance has no auto-assigned public IP
+# (CKV_AWS_88); the EIP also stays stable across idle-stop/start cycles,
+# so the ssh_command output remains valid after an automatic stop.
+resource "aws_eip" "isaac" {
+  domain   = "vpc"
+  instance = aws_instance.isaac.id
+
+  tags = {
+    Name    = "${var.project_name}-eip"
+    Project = var.project_name
   }
 }
 

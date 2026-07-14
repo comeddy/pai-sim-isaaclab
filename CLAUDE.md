@@ -153,9 +153,10 @@ docker run --rm --gpus all --network=host \
 
 | 컴포넌트 | 리소스 | 세부 사항 |
 |---------|--------|---------|
-| Networking | VPC → IGW → Subnet → Route Table | CIDR 10.0.0.0/16, 퍼블릭 서브넷 10.0.1.0/24 (public IP 자동 할당 비활성, 인스턴스에서 명시적 할당) |
+| Networking | VPC → IGW → Subnet → Route Table | CIDR 10.0.0.0/16, 퍼블릭 서브넷 10.0.1.0/24 (public IP 자동 할당 비활성) |
 | Security | Security Group | SSH(22) 인바운드, 전체 아웃바운드 |
-| Compute | g6e.4xlarge EC2 | 1× L40S 48GB, 16 vCPU, 128 GiB RAM, `associate_public_ip_address = true` |
+| Compute | g6e.4xlarge EC2 | 1× L40S 48GB, 16 vCPU, 128 GiB RAM (자동 할당 public IP 없음) |
+| EIP | Elastic IP | SSH 접속 엔드포인트, stop/start 후에도 IP 고정 |
 | AMI | Deep Learning Base OSS Nvidia Driver (Ubuntu 22.04) | NVIDIA 드라이버, CUDA, Docker 사전 설치 |
 | KMS | CMK + Alias | EBS 암호화용 고객 관리 키, 키 로테이션 활성화 |
 | Root EBS | gp3, 300GB, 6000 IOPS, 500 MB/s, KMS CMK 암호화 | OS + Docker 이미지 |
