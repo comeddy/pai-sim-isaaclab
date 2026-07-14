@@ -107,10 +107,11 @@ Terraform -> AWS VPC -> EC2 (g6e.4xlarge) -> Docker (Isaac Lab)
 ### Resources
 | Resource | Type | Description |
 |----------|------|-------------|
-| VPC | aws_vpc | /16 CIDR, single public subnet |
-| EC2 | aws_instance | g6e.4xlarge, L40S GPU |
-| EBS (Root) | aws_ebs_volume | gp3, Docker images |
-| EBS (Data) | aws_ebs_volume | gp3, checkpoints/datasets |
+| VPC | aws_vpc | /16 CIDR, single public subnet (no subnet-level public IP auto-assign) |
+| EC2 | aws_instance | g6e.4xlarge, L40S GPU, explicit public IP for SSH |
+| KMS | aws_kms_key | Customer managed key (CMK) for EBS encryption, rotation enabled |
+| EBS (Root) | aws_ebs_volume | gp3, Docker images, KMS CMK encrypted |
+| EBS (Data) | aws_ebs_volume | gp3, checkpoints/datasets, KMS CMK encrypted |
 | IAM Role | aws_iam_role | SSM + S3 access |
 | CloudWatch | aws_cloudwatch_metric_alarm | GPU idle auto-stop |
 
@@ -230,10 +231,11 @@ Terraform -> AWS VPC -> EC2 (g6e.4xlarge) -> Docker (Isaac Lab)
 ### 리소스
 | 리소스 | 타입 | 설명 |
 |--------|------|------|
-| VPC | aws_vpc | /16 CIDR, 단일 퍼블릭 서브넷 |
-| EC2 | aws_instance | g6e.4xlarge, L40S GPU |
-| EBS (Root) | aws_ebs_volume | gp3, Docker 이미지 |
-| EBS (Data) | aws_ebs_volume | gp3, 체크포인트/데이터셋 |
+| VPC | aws_vpc | /16 CIDR, 단일 퍼블릭 서브넷 (서브넷 레벨 public IP 자동 할당 비활성) |
+| EC2 | aws_instance | g6e.4xlarge, L40S GPU, SSH용 public IP 명시적 할당 |
+| KMS | aws_kms_key | EBS 암호화용 고객 관리 키(CMK), 키 로테이션 활성화 |
+| EBS (Root) | aws_ebs_volume | gp3, Docker 이미지, KMS CMK 암호화 |
+| EBS (Data) | aws_ebs_volume | gp3, 체크포인트/데이터셋, KMS CMK 암호화 |
 | IAM 역할 | aws_iam_role | SSM + S3 접근 |
 | CloudWatch | aws_cloudwatch_metric_alarm | GPU idle 자동 중지 |
 

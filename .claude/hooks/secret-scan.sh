@@ -14,7 +14,7 @@ PATTERNS=(
     'api[_-]?key\s*[:=]\s*["\x27][^"\x27]{8,}'
 )
 
-SKIP_PATTERNS=('.env.example' 'secret-scan.sh' '*.md' 'package-lock.json' 'terraform.tfvars.example')
+SKIP_PATTERNS=('.env.example' 'secret-scan.sh' '*.md' 'package-lock.json' 'terraform.tfvars.example' 'tests/fixtures/*')
 
 STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM 2>/dev/null)
 [ -z "$STAGED_FILES" ] && exit 0

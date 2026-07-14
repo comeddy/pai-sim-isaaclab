@@ -153,12 +153,13 @@ docker run --rm --gpus all --network=host \
 
 | 컴포넌트 | 리소스 | 세부 사항 |
 |---------|--------|---------|
-| Networking | VPC → IGW → Subnet → Route Table | CIDR 10.0.0.0/16, 퍼블릭 서브넷 10.0.1.0/24 |
+| Networking | VPC → IGW → Subnet → Route Table | CIDR 10.0.0.0/16, 퍼블릭 서브넷 10.0.1.0/24 (public IP 자동 할당 비활성, 인스턴스에서 명시적 할당) |
 | Security | Security Group | SSH(22) 인바운드, 전체 아웃바운드 |
-| Compute | g6e.4xlarge EC2 | 1× L40S 48GB, 16 vCPU, 128 GiB RAM |
+| Compute | g6e.4xlarge EC2 | 1× L40S 48GB, 16 vCPU, 128 GiB RAM, `associate_public_ip_address = true` |
 | AMI | Deep Learning Base OSS Nvidia Driver (Ubuntu 22.04) | NVIDIA 드라이버, CUDA, Docker 사전 설치 |
-| Root EBS | gp3, 300GB, 6000 IOPS, 500 MB/s | OS + Docker 이미지 |
-| Data EBS | gp3, 500GB, 6000 IOPS, 500 MB/s, 암호화 | 데이터셋, 체크포인트 (`/data`) |
+| KMS | CMK + Alias | EBS 암호화용 고객 관리 키, 키 로테이션 활성화 |
+| Root EBS | gp3, 300GB, 6000 IOPS, 500 MB/s, KMS CMK 암호화 | OS + Docker 이미지 |
+| Data EBS | gp3, 500GB, 6000 IOPS, 500 MB/s, KMS CMK 암호화 | 데이터셋, 체크포인트 (`/data`) |
 | Instance Store | 600GB NVMe (자동 부착) | 셰이더 캐시, 스크래치 (`/scratch`) |
 | IAM | EC2 Role + Instance Profile | S3 체크포인트 접근 + SSM Session Manager |
 | Monitoring | CloudWatch Alarm | GPU 30분 idle(< 5%) → 인스턴스 자동 Stop |
