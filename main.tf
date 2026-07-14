@@ -76,10 +76,13 @@ resource "aws_internet_gateway" "isaac" {
 }
 
 resource "aws_subnet" "public" {
-  vpc_id                  = aws_vpc.isaac.id
-  cidr_block              = "10.0.1.0/24"
-  availability_zone       = data.aws_availability_zones.available.names[0]
-  map_public_ip_on_launch = true
+  vpc_id            = aws_vpc.isaac.id
+  cidr_block        = "10.0.1.0/24"
+  availability_zone = data.aws_availability_zones.available.names[0]
+
+  # Public IPs are assigned explicitly at the instance level instead of
+  # subnet-wide auto-assignment (CKV_AWS_130)
+  map_public_ip_on_launch = false
 
   tags = {
     Name    = "${var.project_name}-public-subnet"
@@ -205,8 +208,8 @@ resource "aws_iam_role_policy" "s3_checkpoints" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
-      Effect   = "Allow"
-      Action   = ["s3:GetObject", "s3:PutObject", "s3:ListBucket"]
+      Effect = "Allow"
+      Action = ["s3:GetObject", "s3:PutObject", "s3:ListBucket"]
       Resource = [
         "arn:aws:s3:::${var.checkpoint_bucket}",
         "arn:aws:s3:::${var.checkpoint_bucket}/*"
@@ -225,6 +228,26 @@ resource "aws_iam_instance_profile" "isaac" {
 }
 
 # --------------------------------------------------------------------------- #
+# KMS CMK — EBS volume encryption (CKV_AWS_189)
+# --------------------------------------------------------------------------- #
+
+resource "aws_kms_key" "ebs" {
+  description             = "${var.project_name} EBS encryption key (customer managed)"
+  enable_key_rotation     = true
+  deletion_window_in_days = 7
+
+  tags = {
+    Name    = "${var.project_name}-ebs-kms"
+    Project = var.project_name
+  }
+}
+
+resource "aws_kms_alias" "ebs" {
+  name          = "alias/${var.project_name}-ebs"
+  target_key_id = aws_kms_key.ebs.key_id
+}
+
+# --------------------------------------------------------------------------- #
 # EBS Volume for datasets / checkpoints
 # --------------------------------------------------------------------------- #
 
@@ -235,6 +258,7 @@ resource "aws_ebs_volume" "data" {
   throughput        = 500
   iops              = 6000
   encrypted         = true
+  kms_key_id        = aws_kms_key.ebs.arn
 
   tags = {
     Name    = "${var.project_name}-data"
@@ -254,6 +278,9 @@ resource "aws_instance" "isaac" {
   vpc_security_group_ids = [aws_security_group.isaac.id]
   iam_instance_profile   = aws_iam_instance_profile.isaac.name
 
+  # Subnet no longer auto-assigns public IPs — request one explicitly for SSH
+  associate_public_ip_address = true
+
   # Root volume — OS + Docker images
   root_block_device {
     volume_size           = var.root_volume_size_gb
@@ -261,6 +288,7 @@ resource "aws_instance" "isaac" {
     throughput            = 500
     iops                  = 6000
     encrypted             = true
+    kms_key_id            = aws_kms_key.ebs.arn
     delete_on_termination = true
   }
 
@@ -268,7 +296,7 @@ resource "aws_instance" "isaac" {
 
   metadata_options {
     http_endpoint               = "enabled"
-    http_tokens                 = "required"   # IMDSv2 only
+    http_tokens                 = "required" # IMDSv2 only
     http_put_response_hop_limit = 2
   }
 
@@ -312,7 +340,7 @@ resource "aws_cloudwatch_metric_alarm" "gpu_idle" {
   count               = var.enable_idle_stop ? 1 : 0
   alarm_name          = "${var.project_name}-gpu-idle-stop"
   comparison_operator = "LessThanThreshold"
-  evaluation_periods  = 6           # 30 min (6 × 5 min)
+  evaluation_periods  = 6 # 30 min (6 × 5 min)
   metric_name         = "GPUUtilization"
   namespace           = "CWAgent"
   period              = 300

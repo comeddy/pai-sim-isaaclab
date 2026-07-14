@@ -41,19 +41,19 @@ output "ami_name" {
 output "instance_spec" {
   description = "Instance specification summary"
   value = {
-    type     = "g6e.4xlarge"
-    gpu      = "1× NVIDIA L40S (48 GB)"
-    vcpu     = 16
-    memory   = "128 GiB"
-    storage  = "600 GB NVMe instance store"
-    region   = var.aws_region
-    cost_hr  = "~$3.00/hr (on-demand)"
+    type    = "g6e.4xlarge"
+    gpu     = "1× NVIDIA L40S (48 GB)"
+    vcpu    = 16
+    memory  = "128 GiB"
+    storage = "600 GB NVMe instance store"
+    region  = var.aws_region
+    cost_hr = "~$3.00/hr (on-demand)"
   }
 }
 
 output "quick_start" {
   description = "Quick start commands after SSH"
-  value = <<-EOT
+  value       = <<-EOT
 
     # 1. SSH into the instance
     ssh -i isaac-lab-key ubuntu@${aws_instance.isaac.public_ip}
