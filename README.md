@@ -29,11 +29,11 @@ A step-by-step Korean workshop (7 Labs + 3 Appendices) guides users through ever
 
 ## Features
 
-- **One-command GPU infrastructure** — Terraform provisions VPC, g6e.4xlarge EC2 (NVIDIA L40S), EBS volumes, IAM roles, and CloudWatch alarms in a single `terraform apply`.
+- **One-command GPU infrastructure** — Terraform provisions VPC, g6e.4xlarge EC2 (NVIDIA L40S), KMS-encrypted EBS volumes, an Elastic IP, IAM roles, and CloudWatch alarms in a single `terraform apply`.
 - **Automated environment bootstrap** — `user_data.sh` handles NGC login, Isaac Sim Docker pull, Isaac Lab source build, and wrapper script generation without manual intervention.
 - **PPO reinforcement learning** — Trains ANYmal-C locomotion with 4,096 parallel environments, reaching +16.29 mean reward in 75 minutes / 1,500 iterations.
 - **Sim-to-Real policy export** — Exports trained policies as TorchScript JIT (`.pt`) and ONNX (`.onnx`) for deployment on physical robots via TensorRT/Jetson.
-- **Cost-optimized operation** — CloudWatch GPU idle detection auto-stops instances after 30 minutes; S3 checkpoint sync protects against Spot interruptions.
+- **Cost-optimized operation** — CloudWatch GPU idle detection auto-stops instances after 30 minutes; S3 checkpoint sync protects against Spot interruptions. The Elastic IP keeps the SSH endpoint stable across stop/start cycles.
 
 ## Prerequisites
 
@@ -156,6 +156,7 @@ pai-sim-isaaclab/
 │   ├── SUMMARY.md               # Table of contents
 │   ├── book.json                # HonKit configuration
 │   └── chapters/                # Markdown content per lab
+├── deck/                         # Workshop overview deck (standalone HTML slides)
 ├── models/                       # Trained policy models
 │   ├── policy_jit.pt            # TorchScript JIT (C++ inference)
 │   └── policy.onnx              # ONNX (TensorRT/Jetson deployment)
@@ -227,11 +228,11 @@ pai-sim-isaaclab은 Terraform으로 AWS GPU 인프라를 프로비저닝하고, 
 
 ## 주요 기능
 
-- **원커맨드 GPU 인프라** — Terraform이 VPC, g6e.4xlarge EC2(NVIDIA L40S), EBS 볼륨, IAM 역할, CloudWatch 알람을 단일 `terraform apply`로 프로비저닝합니다.
+- **원커맨드 GPU 인프라** — Terraform이 VPC, g6e.4xlarge EC2(NVIDIA L40S), KMS CMK로 암호화된 EBS 볼륨, Elastic IP, IAM 역할, CloudWatch 알람을 단일 `terraform apply`로 프로비저닝합니다.
 - **자동 환경 부트스트랩** — `user_data.sh`가 NGC 로그인, Isaac Sim Docker pull, Isaac Lab 소스 빌드, 래퍼 스크립트 생성을 수동 개입 없이 처리합니다.
 - **PPO 강화학습** — 4,096개 병렬 환경에서 ANYmal-C 보행을 학습하여, 75분 / 1,500 이터레이션 만에 평균 보상 +16.29에 도달합니다.
 - **Sim-to-Real 정책 추출** — 학습된 정책을 TorchScript JIT(`.pt`)와 ONNX(`.onnx`)로 추출하여 TensorRT/Jetson을 통해 실제 로봇에 배포할 수 있습니다.
-- **비용 최적화 운영** — CloudWatch GPU 유휴 감지가 30분 후 자동으로 인스턴스를 중지하며, S3 체크포인트 동기화가 Spot 중단에 대비합니다.
+- **비용 최적화 운영** — CloudWatch GPU 유휴 감지가 30분 후 자동으로 인스턴스를 중지하며, S3 체크포인트 동기화가 Spot 중단에 대비합니다. Elastic IP 덕분에 중지/시작 후에도 SSH 접속 주소가 유지됩니다.
 
 ## 사전 요구 사항
 
@@ -354,6 +355,7 @@ pai-sim-isaaclab/
 │   ├── SUMMARY.md               # 목차
 │   ├── book.json                # HonKit 설정
 │   └── chapters/                # Lab별 마크다운 콘텐츠
+├── deck/                         # 워크샵 개요 덱 (standalone HTML 슬라이드)
 ├── models/                       # 학습된 정책 모델
 │   ├── policy_jit.pt            # TorchScript JIT (C++ 추론용)
 │   └── policy.onnx              # ONNX (TensorRT/Jetson 배포용)

@@ -48,6 +48,11 @@ pai-sim-isaaclab/
 │       ├── appendix-b-cost.md   # 비용 분석 & 최적화
 │       └── appendix-c-references.md       # 소프트웨어 버전 & 참고자료
 │
+├── deck/                         # 워크샵 개요 덱 (claude.ai/design에서 import, deck-stage.js 기반 standalone HTML)
+│   ├── index.html                # 5슬라이드 덱 (Title/개요/파이프라인/데모/Thanks)
+│   ├── deck-stage.js             # 프레젠테이션 웹 컴포넌트 (키보드 내비, 스케일링, 인쇄)
+│   ├── assets/logo-aws.png       # AWS 로고
+│   └── fonts/AmazonEmber_*.ttf   # Amazon Ember 폰트 4종 (Rg/Md/Bd/He)
 ├── models/
 │   ├── policy_jit.pt            # TorchScript JIT (C++ 실시간 추론용)
 │   └── policy.onnx              # ONNX (TensorRT/Jetson GPU 배포용)
@@ -198,8 +203,8 @@ docker run --rm --gpus all --network=host \
 2. **Data EBS 마운트** — Nitro NVMe 장치 동적 탐색, ext4 포맷, `/data` 마운트, 서브디렉토리 생성 (`datasets/`, `checkpoints/`, `logs/`, `cache/`)
 3. **Instance Store NVMe 마운트** — `/opt/dlami/nvme` 재활용 또는 직접 탐색 → `/scratch` 마운트
 4. **NVIDIA 드라이버 & Docker 검증** — `nvidia-smi` 실패 시 즉시 종료
-5. **NGC 로그인 + Isaac Sim pull** — `nvcr.io/nvidia/isaac-sim:{isaac_sim_version}`
-6. **Isaac Lab pull/빌드** — NGC 이미지 시도 → 실패 시 소스 클론(`/opt/isaaclab`) + `docker/container.py start`
+5. **NGC 로그인 + Isaac Sim pull** — `nvcr.io/nvidia/isaac-sim:{isaac_sim_version}` (로그인 실패는 비치명적 — 이미지가 공개라 익명 pull로 계속 진행)
+6. **Isaac Lab pull/빌드** — NGC 이미지 시도 → 실패 시 소스 클론(`/opt/isaaclab`) + `echo n | docker/container.py start base` (X11 프롬프트 자동 응답, v2.1.0에 `--no-enter` 플래그 없음)
 7. **래퍼 스크립트 생성** (`/usr/local/bin/`):
    - `isaac-lab-run`: GPU 볼륨 마운트, 캐시 설정 포함 헤드리스 훈련
    - `isaac-sim-shell`: Isaac Sim 대화형 bash

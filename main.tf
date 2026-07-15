@@ -218,6 +218,26 @@ resource "aws_iam_role_policy" "s3_checkpoints" {
   })
 }
 
+# GPU 메트릭 발행 권한 — 없으면 gpu_monitor.sh가 AccessDenied로 실패해
+# CWAgent/GPUUtilization 메트릭이 비고, idle-stop 알람이 영구
+# INSUFFICIENT_DATA 상태가 되어 자동 중지가 작동하지 않는다.
+resource "aws_iam_role_policy" "cloudwatch_metrics" {
+  name_prefix = "cw-gpu-metrics-"
+  role        = aws_iam_role.isaac.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = ["cloudwatch:PutMetricData"]
+      Resource = "*"
+      Condition = {
+        StringEquals = { "cloudwatch:namespace" = "CWAgent" }
+      }
+    }]
+  })
+}
+
 resource "aws_iam_instance_profile" "isaac" {
   name_prefix = "${var.project_name}-profile-"
   role        = aws_iam_role.isaac.name

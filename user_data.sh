@@ -141,7 +141,13 @@ fi
 # --------------------------------------------------------------------------- #
 NGC_KEY="${ngc_api_key}"
 if [ -n "$NGC_KEY" ]; then
-  echo "$NGC_KEY" | docker login nvcr.io --username '$oauthtoken' --password-stdin
+  # Non-fatal: isaac-sim images are publicly pullable, so an expired/invalid
+  # key must not abort the whole bootstrap (set -e). Clear any bad stored
+  # credentials so anonymous pulls still work.
+  if ! echo "$NGC_KEY" | docker login nvcr.io --username '$oauthtoken' --password-stdin; then
+    echo "WARN: NGC login failed — continuing with anonymous pull"
+    docker logout nvcr.io 2>/dev/null || true
+  fi
 fi
 
 ISAAC_SIM_IMAGE="nvcr.io/nvidia/isaac-sim:${isaac_sim_version}"
@@ -175,7 +181,12 @@ fi
 if [ -z "$ISAAC_LAB_IMAGE" ] && [ -f "$ISAACLAB_DIR/docker/container.py" ]; then
   echo "Building Isaac Lab Docker image from source..."
   cd "$ISAACLAB_DIR"
-  python3 docker/container.py start --no-enter || true
+  # v2.1.0 interface: 'start [profile]' builds the image and starts the
+  # container detached (there is no --no-enter flag). Pipe 'n' to answer the
+  # X11-forwarding prompt — cloud-init has no stdin and input() would crash.
+  # Non-fatal, but loud:
+  echo n | python3 docker/container.py start base || \
+    echo "WARN: Isaac Lab image build failed — run 'python3 docker/container.py start base' in $ISAACLAB_DIR manually"
 fi
 
 # --------------------------------------------------------------------------- #
@@ -244,7 +255,7 @@ chmod +x /usr/local/bin/sync-checkpoints
 
 # ---- Cron: sync checkpoints every 30 min ----
 CRON_LINE="*/30 * * * * /usr/local/bin/sync-checkpoints >> /data/logs/sync.log 2>&1"
-(crontab -l 2>/dev/null; echo "$CRON_LINE") | crontab -
+(crontab -l 2>/dev/null || true; echo "$CRON_LINE") | crontab -
 
 # --------------------------------------------------------------------------- #
 # 9. GPU monitoring with CloudWatch (optional)
@@ -271,7 +282,7 @@ MONITOR
 chmod +x /opt/gpu_monitor.sh
 
 GPU_CRON="*/5 * * * * /opt/gpu_monitor.sh >> /data/logs/gpu_monitor.log 2>&1"
-(crontab -l 2>/dev/null; echo "$GPU_CRON") | crontab -
+(crontab -l 2>/dev/null || true; echo "$GPU_CRON") | crontab -
 
 # --------------------------------------------------------------------------- #
 # 10. Done
