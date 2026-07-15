@@ -277,6 +277,7 @@ Instance Store 구분: `nvme id-ctrl` 출력에서 "Amazon Elastic Block Store" 
 
 - `terraform.tfvars`는 `.gitignore`에 포함되어 있음 — 커밋 방지됨
 - `ngc_api_key`는 `sensitive = true` — `terraform output`으로 평문 노출 안 됨
+- 단, `ngc_api_key`는 user data와 tfstate에는 평문 렌더링됨 — 워크샵 이상의 용도라면 Secrets Manager/SSM Parameter Store에 저장하고 인스턴스 롤로 부팅 시 조회 권장
 - `ssh_private_key` 출력도 `sensitive = true`
 - `terraform.tfvars.example`에는 실제 키 절대 기입 금지
 

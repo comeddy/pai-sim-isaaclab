@@ -84,11 +84,11 @@ if [ -n "$DATA_DEV" ] && [ -b "$DATA_DEV" ]; then
   mount "$DATA_DEV" "$DATA_MNT"
   echo "$DATA_DEV $DATA_MNT ext4 defaults,nofail 0 2" >> /etc/fstab
   mkdir -p "$DATA_MNT"/{datasets,checkpoints,logs,cache}
-  chmod -R 777 "$DATA_MNT"
+  chmod -R 755 "$DATA_MNT"
 else
   echo "WARNING: Data EBS volume not found, creating /data on root volume"
   mkdir -p "$DATA_MNT"/{datasets,checkpoints,logs,cache}
-  chmod -R 777 "$DATA_MNT"
+  chmod -R 755 "$DATA_MNT"
 fi
 
 # --------------------------------------------------------------------------- #
@@ -101,7 +101,7 @@ if mountpoint -q /opt/dlami/nvme 2>/dev/null; then
   mkdir -p /opt/dlami/nvme/scratch
   ln -sfn /opt/dlami/nvme/scratch /scratch
   mkdir -p /scratch/{isaac-sim-cache,tmp}
-  chmod -R 777 /scratch
+  chmod -R 755 /scratch
 else
   # Find an unmounted NVMe instance store (non-EBS)
   for dev in /dev/nvme*n1; do
@@ -115,7 +115,7 @@ else
       mkdir -p /scratch
       mount "$dev" /scratch
       mkdir -p /scratch/{isaac-sim-cache,tmp}
-      chmod -R 777 /scratch
+      chmod -R 755 /scratch
       break
     fi
   done

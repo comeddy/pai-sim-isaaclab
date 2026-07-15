@@ -15,6 +15,8 @@
 
 # English
 
+> **⚠️ Workshop / educational use only** — This project is designed for short-lived, hands-on workshop environments and is **not hardened for production**. Before any long-lived or production deployment, review the security posture: restrict `allowed_ssh_cidrs`, tighten IAM scope, enable VPC flow logs, and manage secrets outside `terraform.tfvars`.
+
 ## Overview
 
 pai-sim-isaaclab is an end-to-end pipeline that provisions AWS GPU infrastructure with Terraform and trains an ANYmal-C quadruped robot to walk over rough terrain using PPO reinforcement learning in NVIDIA Isaac Lab. The entire process — from infrastructure deployment to trained policy export — completes in under 2 hours for approximately $12.
@@ -138,6 +140,8 @@ terraform destroy
 | `enable_idle_stop` | Auto-stop instance when GPU idle for 30 min | `true` |
 | `allowed_ssh_cidrs` | CIDR blocks allowed to SSH | `["0.0.0.0/0"]` |
 
+> **Security note**: `ngc_api_key` is rendered into EC2 user data and stored in Terraform state in plain text. For anything beyond a short-lived workshop, store the key in **AWS Secrets Manager** (or SSM Parameter Store) and fetch it at boot through the instance role instead of passing it via `terraform.tfvars`. Also set `allowed_ssh_cidrs` to your own IP (`x.x.x.x/32`) rather than the open default.
+
 ## Project Structure
 
 ```
@@ -213,6 +217,8 @@ This project's Terraform code and workshop documentation are released under the 
 ---
 
 # 한국어
+
+> **⚠️ 워크샵/교육용 환경** — 이 프로젝트는 단기 실습용으로 설계되었으며 **프로덕션 수준으로 강화되어 있지 않습니다**. 장기 운영이나 프로덕션 배포 전에는 보안 구성을 재검토하세요: `allowed_ssh_cidrs` 제한, IAM 권한 최소화, VPC Flow Logs 활성화, 시크릿을 `terraform.tfvars` 밖에서 관리.
 
 ## 개요
 
@@ -336,6 +342,8 @@ terraform destroy
 | `checkpoint_bucket` | 체크포인트 동기화용 S3 버킷명 | `isaac-lab-checkpoints` |
 | `enable_idle_stop` | GPU 30분 유휴 시 자동 중지 | `true` |
 | `allowed_ssh_cidrs` | SSH 허용 CIDR 블록 | `["0.0.0.0/0"]` |
+
+> **보안 참고**: `ngc_api_key`는 EC2 user data와 Terraform state에 평문으로 저장됩니다. 단기 워크샵 이상의 용도라면 키를 **AWS Secrets Manager**(또는 SSM Parameter Store)에 저장하고 인스턴스 롤을 통해 부팅 시 조회하는 방식을 권장합니다. `allowed_ssh_cidrs`도 기본 개방값 대신 본인 IP(`x.x.x.x/32`)로 제한하세요.
 
 ## 프로젝트 구조
 
